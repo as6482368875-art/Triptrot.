@@ -1,1211 +1,1829 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>TRIPTROT - 좋아하는 가수를 만나러 가는 길, 누구나 쉽고 안전하게</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>TRIPTROT - 트롯 팬덤 기반 체류형 지역관광 플랫폼</title>
+  
+  <!-- Tailwind CSS & Pretendard Font -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  
+  <!-- React 18, ReactDOM, Babel (TypeScript 지원), Lucide Icons -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Kakao Maps SDK (API 키 입력 시 실지도 렌더링, 미입력 시 스마트 벡터맵 자동 전환) -->
+  <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=YOUR_KAKAO_MAP_API_KEY&autoload=false"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy: {
+              DEFAULT: '#1B2A4A',
+              light: '#2A3F6E',
+              dark: '#111C33'
+            },
+            cream: {
+              DEFAULT: '#FAF7F2',
+              dark: '#F0EAE1',
+              border: '#E2D9CC'
+            },
+            coral: {
+              DEFAULT: '#E85D4A',
+              light: '#FFF0ED',
+              dark: '#C94533'
+            }
+          }
+        }
+      }
+    }
+  </script>
 
   <style>
     body {
       font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
-      background-color: #F4F1EA;
-      color: #1F1916;
-      font-size: 16px;
-      line-height: 1.55;
+      background-color: #FAF7F2;
+      color: #1B2A4A;
+      word-break: keep-all;
     }
-    /* 접근성 강화: 큰 글씨 & 고대비 모드 */
-    body.large-mode {
-      font-size: 19px !important;
+    /* 어르신 배려 큰 글씨 모드 */
+    body.senior-large {
+      font-size: 112%;
     }
-    body.large-mode .u-title { font-size: 1.55rem !important; line-height: 2.1rem !important; }
-    body.large-mode .u-sub { font-size: 1.2rem !important; line-height: 1.75rem !important; }
-    body.large-mode .u-btn { font-size: 1.2rem !important; padding-top: 1rem !important; padding-bottom: 1rem !important; }
+    body.senior-large .s-title { font-size: 1.5rem !important; line-height: 2.1rem !important; }
+    body.senior-large .s-body { font-size: 1.15rem !important; line-height: 1.75rem !important; }
+    body.senior-large .s-btn { font-size: 1.15rem !important; padding-top: 0.9rem !important; padding-bottom: 0.9rem !important; }
 
-    .card-box {
-      background: #FFFFFF;
-      border-radius: 22px;
-      box-shadow: 0 6px 20px rgba(31, 25, 22, 0.06);
-      border: 2px solid #E6DFD3;
-    }
-    .brand-orange { background-color: #EA580C; }
-    .brand-orange-grad { background: linear-gradient(135deg, #F97316 0%, #C2410C 100%); }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
-<body class="flex justify-center min-h-screen">
-
-  <!-- 반응형 앱 컨테이너 -->
-  <div class="w-full max-w-[500px] bg-[#FAF8F5] min-h-screen flex flex-col justify-between relative shadow-2xl pb-24 border-x border-[#E2D9C8]">
-
-    <!-- ================= 1. 상단 고정 헤더 ================= -->
-    <header class="sticky top-0 z-30 bg-white/95 backdrop-blur-md px-4 py-3.5 border-b-2 border-[#E6DFD3] flex justify-between items-center">
-      <div onclick="switchMenu('menu-home')" class="cursor-pointer flex items-center gap-2">
-        <span class="w-9 h-9 rounded-xl brand-orange text-white flex items-center justify-center font-black text-lg shadow-xs">🎵</span>
-        <div>
-          <span class="font-black text-xl tracking-tight text-[#EA580C] block leading-none">TRIPTROT</span>
-          <span class="text-[11px] font-bold text-gray-500 block mt-0.5">콘서트 이동부터 귀가까지</span>
-        </div>
-      </div>
-
-      <div class="flex items-center gap-1.5">
-        <button onclick="openMyReservationModal()" class="bg-[#FEE500] text-[#191919] font-black px-3 py-2 rounded-xl text-xs flex items-center gap-1 shadow-2xs">
-          <i class="fa-solid fa-receipt"></i>
-          <span>예약확인</span>
-          <span id="header-res-count" class="bg-rose-600 text-white text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center">0</span>
-        </button>
-        <button onclick="toggleLargeMode()" id="largeBtn" class="bg-amber-100 text-amber-950 border border-amber-300 font-black px-2.5 py-2 rounded-xl text-xs">
-          <span>큰글씨+</span>
-        </button>
-        <button onclick="openAdminModal()" class="bg-gray-800 text-white font-bold px-2.5 py-2 rounded-xl text-xs" title="관리자 페이지">
-          <i class="fa-solid fa-gear"></i>
-        </button>
-      </div>
-    </header>
-
-    <!-- 상단 메뉴 탭 바 (한 페이지에 넣지 않고 5개 독립 메뉴로 완전 분리) -->
-    <div class="px-3 pt-3">
-      <div class="bg-white p-1.5 rounded-2xl border-2 border-[#E6DFD3] grid grid-cols-5 gap-1 text-center shadow-2xs">
-        <button onclick="switchMenu('menu-home')" id="top-menu-home" class="py-2 rounded-xl brand-orange text-white font-black text-xs flex flex-col items-center gap-0.5">
-          <i class="fa-solid fa-house text-xs"></i>
-          <span>1.홈·선택</span>
-        </button>
-        <button onclick="switchMenu('menu-senior')" id="top-menu-senior" class="py-2 rounded-xl text-gray-500 font-bold text-xs flex flex-col items-center gap-0.5">
-          <i class="fa-solid fa-calendar-check text-xs"></i>
-          <span>2.간편예약</span>
-        </button>
-        <button onclick="switchMenu('menu-schedule')" id="top-menu-schedule" class="py-2 rounded-xl text-gray-500 font-bold text-xs flex flex-col items-center gap-0.5">
-          <i class="fa-solid fa-route text-xs"></i>
-          <span>3.동선·안내</span>
-        </button>
-        <button onclick="switchMenu('menu-child')" id="top-menu-child" class="py-2 rounded-xl text-gray-500 font-bold text-xs flex flex-col items-center gap-0.5">
-          <i class="fa-solid fa-heart-circle-check text-xs"></i>
-          <span>4.자녀안심</span>
-        </button>
-        <button onclick="switchMenu('menu-club')" id="top-menu-club" class="py-2 rounded-xl text-gray-500 font-bold text-xs flex flex-col items-center gap-0.5">
-          <i class="fa-solid fa-users-gear text-xs"></i>
-          <span>5.총무관리</span>
-        </button>
-      </div>
-    </div>
-
-    <!-- ================= 메인 화면 영역 (메뉴별 독립 화면) ================= -->
-    <main class="p-4 flex-1">
-
-      <!-- =========================================================================
-           [메뉴 1: 홈 & 3대 고객별 맞춤형 진입 화면 + 신뢰 정책 명시]
-           ========================================================================= -->
-      <section id="menu-home" class="space-y-5">
-        
-        <!-- 핵심 정체성 배너 -->
-        <div class="rounded-3xl p-6 bg-gradient-to-br from-[#29201B] to-[#433228] text-white shadow-lg space-y-3">
-          <div class="inline-flex items-center gap-1.5 bg-emerald-500/20 border border-emerald-400 text-emerald-300 px-3 py-1 rounded-full text-xs font-black">
-            <i class="fa-solid fa-shield-halved"></i>
-            <span>콘서트 이동부터 귀가까지 책임지는 플랫폼</span>
-          </div>
-          <h1 class="text-2xl font-black leading-snug u-title">
-            좋아하는 가수를 만나러 가는 길,<br>
-            <span class="text-[#FDBA74]">누구나 쉽고 안전하게.</span>
-          </h1>
-          <p class="text-amber-100/90 text-sm font-semibold u-sub">
-            어르신에게는 편리한 여행을, 자녀에게는 부모님에 대한 안심을, 팬클럽에게는 편리한 단체 관리를 제공합니다.
-          </p>
-        </div>
-
-        <!-- 3대 고객별 맞춤형 시작 카드 (문제점 1 해결: 주요 고객층 명확히 구분) -->
-        <div class="space-y-3">
-          <h2 class="text-lg font-black text-gray-900 px-1 u-title">👆 어떤 목적으로 방문하셨나요? (선택)</h2>
-
-          <!-- ① 어르신 - 쉬운 동행 -->
-          <div onclick="switchMenu('menu-senior')" class="cursor-pointer card-box p-5 hover:border-[#EA580C] transition space-y-2.5">
-            <div class="flex justify-between items-center">
-              <span class="bg-emerald-100 text-emerald-800 text-xs font-black px-3 py-1 rounded-full">사용 편의성 개선</span>
-              <span class="text-xs font-black text-[#EA580C]">바로 이동 ➔</span>
-            </div>
-            <h3 class="text-xl font-black text-gray-900 u-title">① 어르신 – 쉬운 동행 (간편 예약)</h3>
-            <ul class="text-sm font-bold text-gray-600 space-y-1 pl-1 u-sub">
-              <li>• 큰 글씨와 직관적인 버튼으로 4단계 간편 예약</li>
-              <li>• 음성 안내 지원 및 상담원 전화 예약 연결</li>
-              <li>• 당일 출발·식사·공연장 탑승 위치 한눈에 안내</li>
-            </ul>
-          </div>
-
-          <!-- ② 자녀 - 부모님 안심 서비스 -->
-          <div onclick="switchMenu('menu-child')" class="cursor-pointer card-box p-5 hover:border-sky-600 transition space-y-2.5">
-            <div class="flex justify-between items-center">
-              <span class="bg-sky-100 text-sky-800 text-xs font-black px-3 py-1 rounded-full">구매 편의성 개선</span>
-              <span class="text-xs font-black text-sky-700">바로 이동 ➔</span>
-            </div>
-            <h3 class="text-xl font-black text-gray-900 u-title">② 자녀 – 부모님 안심 서비스</h3>
-            <ul class="text-sm font-bold text-gray-600 space-y-1 pl-1 u-sub">
-              <li>• 부모님 대신 간편하게 예약 및 결제하기</li>
-              <li>• 예약 일정 및 탑승권 카카오톡 바로 공유</li>
-              <li>• 부모님 버스 탑승·식사·공연장 도착 실시간 알림</li>
-            </ul>
-          </div>
-
-          <!-- ③ 팬클럽 총무 - 단체 관리 시스템 -->
-          <div onclick="switchMenu('menu-club')" class="cursor-pointer card-box p-5 hover:border-purple-600 transition space-y-2.5">
-            <div class="flex justify-between items-center">
-              <span class="bg-purple-100 text-purple-800 text-xs font-black px-3 py-1 rounded-full">운영 효율성 개선</span>
-              <span class="text-xs font-black text-purple-700">바로 이동 ➔</span>
-            </div>
-            <h3 class="text-xl font-black text-gray-900 u-title">③ 팬클럽 총무 – 단체 관리 시스템</h3>
-            <ul class="text-sm font-bold text-gray-600 space-y-1 pl-1 u-sub">
-              <li>• 단톡방 단체 초대 링크 생성 및 참석자 모집</li>
-              <li>• 참석자 명단 및 입금 완료 여부 원클릭 관리</li>
-              <li>• 호차별 버스 인원 배정, 공지사항 및 QR 체크인</li>
-            </ul>
-          </div>
-        </div>
-
-        <!-- 문제점 5 & 10 해결: 서비스 신뢰성(여행업 등록·보험·환불정책) 및 단골 재예약 혜택 명시 -->
-        <div class="card-box p-5 bg-[#FAF6F0] space-y-3">
-          <h4 class="font-black text-base text-gray-900 flex items-center gap-1.5">
-            <i class="fa-solid fa-certificate text-[#EA580C]"></i>
-            <span>안심하고 이용하세요! 서비스 신뢰 보증 정책</span>
-          </h4>
-          <div class="grid grid-cols-2 gap-2 text-xs font-bold text-gray-700">
-            <div class="bg-white p-3 rounded-xl border">
-              <div class="font-black text-gray-900">🏢 정식 여행업 등록</div>
-              <div class="text-gray-500 mt-0.5">제휴 등록 여행사 안전 운행</div>
-            </div>
-            <div class="bg-white p-3 rounded-xl border">
-              <div class="font-black text-gray-900">🛡️ 1억 여행자보험</div>
-              <div class="text-gray-500 mt-0.5">탑승객 전원 자동 가입 완료</div>
-            </div>
-            <div class="bg-white p-3 rounded-xl border">
-              <div class="font-black text-gray-900">💯 100% 환불 보장</div>
-              <div class="text-gray-500 mt-0.5">출발 7일 전 전액 무위약금 환불</div>
-            </div>
-            <div class="bg-white p-3 rounded-xl border">
-              <div class="font-black text-gray-900">🎁 단골·팬클럽 재예약</div>
-              <div class="text-gray-500 mt-0.5">2회차부터 5,000원 즉시 할인</div>
-            </div>
-          </div>
-        </div>
-
-      </section>
-
-
-      <!-- =========================================================================
-           [메뉴 2: 어르신 – 쉬운 동행 (가수 ➔ 날짜 ➔ 출발지 ➔ 인원 4단계 간편 예약)]
-           ========================================================================= -->
-      <section id="menu-senior" class="space-y-5 hidden">
-        
-        <!-- 상단 음성 안내 & 전화 예약 바 -->
-        <div class="bg-emerald-800 text-white p-4 rounded-3xl flex justify-between items-center shadow-md">
-          <div>
-            <span class="bg-emerald-200 text-emerald-950 text-xs font-black px-2.5 py-0.5 rounded-full">어르신 맞춤 화면</span>
-            <h2 class="text-lg font-black mt-1 u-title">순서대로 4번만 누르면 예약 끝!</h2>
-          </div>
-          <div class="flex gap-1.5">
-            <button onclick="speakSeniorGuide()" class="bg-white text-emerald-900 font-black px-3 py-2.5 rounded-2xl text-xs flex flex-col items-center">
-              <i class="fa-solid fa-volume-high text-base mb-0.5"></i>
-              <span>음성안내</span>
-            </button>
-            <a href="tel:15880000" class="bg-[#F3CA52] text-gray-900 font-black px-3 py-2.5 rounded-2xl text-xs flex flex-col items-center">
-              <i class="fa-solid fa-phone text-base mb-0.5"></i>
-              <span>전화예약</span>
-            </a>
-          </div>
-        </div>
-
-        <!-- 1단계: 가수 선택 -->
-        <div class="card-box p-5 space-y-3">
-          <div class="flex justify-between items-center">
-            <span class="bg-[#EA580C] text-white text-xs font-black px-3 py-1 rounded-full">1단계</span>
-            <span class="text-xs font-bold text-gray-500">가수별 공연 DB 자동 연동</span>
-          </div>
-          <h3 class="text-lg font-black text-gray-900 u-title">어떤 가수의 콘서트에 가시나요?</h3>
-          <div id="senior-singer-grid" class="grid grid-cols-2 gap-2.5">
-            <!-- JS로 동적 생성 -->
-          </div>
-        </div>
-
-        <!-- 2단계: 공연 날짜 선택 -->
-        <div class="card-box p-5 space-y-3">
-          <span class="bg-[#EA580C] text-white text-xs font-black px-3 py-1 rounded-full">2단계</span>
-          <h3 class="text-lg font-black text-gray-900 u-title">언제 열리는 공연에 가시나요?</h3>
-          <div id="senior-date-grid" class="grid grid-cols-1 gap-2">
-            <!-- JS로 선택된 가수의 공연 날짜 자동 연동 -->
-          </div>
-        </div>
-
-        <!-- 3단계: 출발지(탑승 장소) 선택 -->
-        <div class="card-box p-5 space-y-3">
-          <span class="bg-[#EA580C] text-white text-xs font-black px-3 py-1 rounded-full">3단계</span>
-          <h3 class="text-lg font-black text-gray-900 u-title">어디서 버스를 타시겠어요?</h3>
-          <div id="senior-origin-grid" class="grid grid-cols-1 gap-2">
-            <!-- JS로 출발지 및 정확한 출발 시간 표시 -->
-          </div>
-        </div>
-
-        <!-- 4단계: 인원 선택 및 즉시 예약 완료 -->
-        <div class="card-box p-5 space-y-4 border-2 border-[#EA580C]">
-          <span class="bg-[#EA580C] text-white text-xs font-black px-3 py-1 rounded-full">4단계 (마지막)</span>
-          <h3 class="text-lg font-black text-gray-900 u-title">몇 분이서 가시나요?</h3>
-
-          <div class="grid grid-cols-3 gap-2">
-            <button onclick="selectSeniorPax(1)" id="spax-1" class="py-3.5 rounded-2xl border-2 border-[#EA580C] bg-orange-50 font-black text-base text-gray-900 u-btn">1명 (혼자)</button>
-            <button onclick="selectSeniorPax(2)" id="spax-2" class="py-3.5 rounded-2xl border-2 border-gray-200 bg-white font-bold text-base text-gray-600 u-btn">2명 (둘이서)</button>
-            <button onclick="selectSeniorPax(3)" id="spax-3" class="py-3.5 rounded-2xl border-2 border-gray-200 bg-white font-bold text-base text-gray-600 u-btn">3명 이상</button>
-          </div>
-
-          <div class="grid grid-cols-2 gap-2 pt-1">
-            <input id="senior-name" type="text" value="김영숙" placeholder="어르신 성함" class="p-3.5 rounded-xl bg-gray-50 border-2 border-gray-300 font-black text-base text-center" />
-            <input id="senior-phone" type="tel" value="010-1234-5678" placeholder="연락처" class="p-3.5 rounded-xl bg-gray-50 border-2 border-gray-300 font-black text-base text-center" />
-          </div>
-
-          <!-- 요약 및 확정 버튼 -->
-          <div class="bg-[#29201B] text-white p-4 rounded-2xl space-y-3">
-            <div class="flex justify-between items-center border-b border-gray-700 pb-2">
-              <span id="senior-summary-text" class="text-sm font-bold text-amber-200">이찬원 대구 · 1명</span>
-              <span class="bg-emerald-600 text-white text-xs font-black px-2 py-0.5 rounded">출발 100% 확정</span>
-            </div>
-            <div class="flex justify-between items-center">
-              <div>
-                <span class="text-xs text-gray-300 block">왕복버스 + 맛집식사 포함</span>
-                <span id="senior-total-price" class="text-2xl font-black text-[#FDBA74]">59,000원</span>
-              </div>
-              <button onclick="submitSeniorBooking()" class="px-6 py-4 rounded-xl brand-orange-grad text-white font-black text-base shadow-lg u-btn">
-                예약 완료하기 ➔
-              </button>
-            </div>
-          </div>
-        </div>
-
-      </section>
-
-
-      <!-- =========================================================================
-           [메뉴 3: 당일 구체적 동선 · 식사 · 공연장 집결지 · 담당자 연락 안내]
-           ========================================================================= -->
-      <section id="menu-schedule" class="space-y-5 hidden">
-        
-        <div class="card-box p-5 space-y-4">
-          <div class="flex justify-between items-center">
-            <span class="bg-amber-100 text-amber-900 text-xs font-black px-3 py-1 rounded-full">문제점 4 & 9 해결</span>
-            <button onclick="speakScheduleGuide()" class="text-xs font-black text-[#EA580C] underline">🔊 일정 음성으로 듣기</button>
-          </div>
-          <h2 id="sched-concert-title" class="text-xl font-black text-gray-900 u-title">
-            이찬원 대구 콘서트 당일 상세 일정표
-          </h2>
-          <p class="text-sm text-gray-600 font-bold u-sub">
-            출발 시간부터 탑승 장소, 점심 식사 메뉴, 공연 후 귀가 버스 타는 곳까지 한눈에 확인하세요.
-          </p>
-
-          <!-- 시간대별 구체적 타임라인 -->
-          <div id="sched-timeline-box" class="space-y-3 pt-1">
-            <!-- JS로 가수별 출발·식사·공연·귀가 시간표 렌더링 -->
-          </div>
-        </div>
-
-        <!-- 현장 이동 불안감 해소: 공연장 집결 장소 & 담당자 직통 연락 카드 -->
-        <div class="card-box p-5 border-2 border-emerald-600 bg-emerald-50/40 space-y-3.5">
-          <div class="flex justify-between items-center">
-            <span class="bg-emerald-700 text-white text-xs font-black px-3 py-1 rounded-full">🧭 현장 길 잃음 방지 안내</span>
-            <span class="text-xs font-black text-emerald-900">인솔자 상시 대기</span>
-          </div>
-
-          <h3 class="text-lg font-black text-gray-900 u-title">공연장 도착 후 화장실 & 귀가 버스 집결 장소</h3>
-
-          <div class="bg-white p-4 rounded-2xl border border-emerald-200 space-y-2 text-sm font-bold text-gray-800 u-sub">
-            <p>📍 <strong>귀가 버스 타는 곳:</strong> <span id="sched-meetup-spot" class="text-rose-600 font-black">대구 엑스코 동관 3번 파란 기둥 앞 (노란 깃발)</span></p>
-            <p>🚽 <strong>안 붐비는 화장실:</strong> 1층 로비 대신 <strong>입구 우측 에스컬레이터 타고 2층 카페 옆 화장실</strong>을 이용하시면 대기 줄이 없습니다.</p>
-            <p>👩‍✈️ <strong>당일 담당 인솔자:</strong> 김민지 매니저 (노란색 TRIPTROT 조끼 착용)</p>
-          </div>
-
-          <div class="grid grid-cols-2 gap-2.5">
-            <a href="tel:01012345678" class="py-3.5 rounded-xl bg-emerald-700 text-white font-black text-sm flex items-center justify-center gap-1.5 shadow-sm u-btn">
-              <i class="fa-solid fa-phone-volume"></i>
-              <span>담당자 바로 전화</span>
-            </a>
-            <button onclick="shareScheduleToKakao()" class="py-3.5 rounded-xl bg-[#FEE500] text-[#191919] font-black text-sm flex items-center justify-center gap-1.5 shadow-sm u-btn">
-              <i class="fa-solid fa-comment"></i>
-              <span>일정표 카톡 저장</span>
-            </button>
-          </div>
-        </div>
-
-      </section>
-
-
-      <!-- =========================================================================
-           [메뉴 4: 자녀 – 부모님 안심 서비스 (대리 예약·카톡 공유·탑승 및 도착 알림)]
-           ========================================================================= -->
-      <section id="menu-child" class="space-y-5 hidden">
-        
-        <div class="bg-sky-900 text-white p-5 rounded-3xl space-y-2 shadow-md">
-          <span class="bg-sky-300 text-sky-950 text-xs font-black px-3 py-0.5 rounded-full">자녀 전용 안심 서비스</span>
-          <h2 class="text-xl font-black u-title">부모님 대신 예약하고, 탑승·도착 알림을 받으세요</h2>
-          <p class="text-xs text-sky-100 font-semibold u-sub">
-            부모님께서 앱을 조작하실 필요 없이, 자녀분이 결제 후 카카오톡으로 탑승권을 보내드릴 수 있습니다.
-          </p>
-        </div>
-
-        <!-- 1. 부모님 대신 예약 및 결제 폼 -->
-        <div class="card-box p-5 space-y-4 border-2 border-sky-600">
-          <h3 class="text-lg font-black text-gray-900 u-title">💝 부모님 대신 콘서트 동행 예약하기</h3>
-
-          <div class="space-y-3 text-sm">
-            <div>
-              <label class="font-black text-gray-700 block mb-1">1. 부모님이 보러 가실 공연 선택</label>
-              <select id="child-concert-select" onchange="updateChildForm()" class="w-full p-3.5 rounded-xl bg-gray-50 border-2 border-gray-300 font-black text-gray-900">
-                <!-- JS 연동 -->
-              </select>
-            </div>
-
-            <div>
-              <label class="font-black text-gray-700 block mb-1">2. 동행 패키지 선택</label>
-              <div class="grid grid-cols-2 gap-2">
-                <button onclick="selectChildPkg('basic')" id="cpkg-basic" class="p-3 rounded-xl border-2 border-sky-600 bg-sky-50 text-left">
-                  <div class="font-black text-gray-900">🚌 기본 안심셔틀</div>
-                  <div class="text-xs font-black text-sky-700 mt-0.5">1인 59,000원</div>
-                </button>
-                <button onclick="selectChildPkg('premium')" id="cpkg-premium" class="p-3 rounded-xl border-2 border-gray-200 bg-white text-left">
-                  <div class="font-black text-gray-900">👑 전담 매니저 의전</div>
-                  <div class="text-xs font-bold text-gray-600 mt-0.5">1인 240,000원</div>
-                </button>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-2">
-              <div>
-                <label class="font-black text-gray-700 block mb-1">3. 부모님 성함</label>
-                <input id="child-parent-name" type="text" value="이순자 어머니" class="w-full p-3 rounded-xl bg-gray-50 border-2 border-gray-300 font-black text-gray-900" />
-              </div>
-              <div>
-                <label class="font-black text-gray-700 block mb-1">4. 부모님 연락처</label>
-                <input id="child-parent-phone" type="tel" value="010-9876-5432" class="w-full p-3 rounded-xl bg-gray-50 border-2 border-gray-300 font-black text-gray-900" />
-              </div>
-            </div>
-          </div>
-
-          <button onclick="submitChildProxyBooking()" class="w-full py-4 rounded-2xl bg-sky-700 hover:bg-sky-800 text-white font-black text-base shadow-md flex items-center justify-center gap-2 u-btn">
-            <i class="fa-solid fa-credit-card"></i>
-            <span>부모님 대신 예약 확정 & 부모님 카톡으로 일정 보내기</span>
-          </button>
-        </div>
-
-        <!-- 2. 실시간 부모님 탑승 및 도착 알림 현황판 (자녀 불안감 해소) -->
-        <div class="card-box p-5 space-y-4">
-          <div class="flex justify-between items-center">
-            <div>
-              <span class="bg-emerald-100 text-emerald-800 text-xs font-black px-2.5 py-0.5 rounded-full">가족 일정 실시간 공유</span>
-              <h3 class="text-lg font-black text-gray-900 mt-1 u-title">🔔 부모님 실시간 탑승 및 도착 알림</h3>
-            </div>
-            <button onclick="simulateNextBoardingStep()" class="bg-sky-100 text-sky-900 font-black px-3 py-1.5 rounded-xl text-xs border border-sky-300">
-              단계 진행 테스트 ➔
-            </button>
-          </div>
-
-          <div id="child-live-tracker" class="space-y-2.5 bg-gray-50 p-4 rounded-2xl border">
-            <!-- JS로 4단계(버스 탑승 -> 식당 도착 -> 공연장 착석 -> 귀가 완료) 실시간 상태 표시 -->
-          </div>
-
-          <button onclick="shareFamilyStatusKakao()" class="w-full py-3.5 rounded-xl bg-[#FEE500] text-[#191919] font-black text-sm flex items-center justify-center gap-2 u-btn">
-            <i class="fa-solid fa-comment"></i>
-            <span>가족 단톡방에 부모님 현재 이동 상태 카톡 공유하기</span>
-          </button>
-        </div>
-
-      </section>
-
-
-      <!-- =========================================================================
-           [메뉴 5: 팬클럽 총무 – 단체 관리 시스템 (초대링크·입금관리·버스배정·QR체크인)]
-           ========================================================================= -->
-      <section id="menu-club" class="space-y-5 hidden">
-        
-        <div class="bg-purple-950 text-white p-5 rounded-3xl space-y-2 shadow-md">
-          <div class="flex justify-between items-center">
-            <span class="bg-purple-300 text-purple-950 text-xs font-black px-3 py-0.5 rounded-full">팬클럽 총무 전용 대시보드</span>
-            <span class="text-xs font-bold text-amber-300">데이터 자동 저장됨</span>
-          </div>
-          <h2 class="text-xl font-black u-title">참석자·입금·버스 배정·QR 체크인 통합 관리</h2>
-          <p class="text-xs text-purple-200 font-semibold">
-            수기 엑셀 작업 없이 단톡방 초대 링크 하나로 명단과 회비 입금, 호차 배정을 한 곳에서 끝내세요.
-          </p>
-        </div>
-
-        <!-- 1. 단체 초대 링크 & 전체 현황 요약 -->
-        <div class="card-box p-5 space-y-4">
-          <div class="flex justify-between items-center">
-            <h3 class="font-black text-base text-gray-900">📋 찬스 경남지부 대구 콘서트 원정단</h3>
-            <button onclick="sendClubInviteLink()" class="bg-[#FEE500] text-[#191919] font-black px-3 py-1.5 rounded-xl text-xs flex items-center gap-1 shadow-2xs">
-              <i class="fa-solid fa-link"></i>
-              <span>단체 초대링크 카톡 공유</span>
-            </button>
-          </div>
-
-          <!-- 실시간 집계 숫자 카드 3개 -->
-          <div class="grid grid-cols-3 gap-2 text-center">
-            <div class="bg-gray-50 p-3 rounded-2xl border">
-              <span class="text-xs font-bold text-gray-500 block">총 신청 인원</span>
-              <span id="club-stat-total" class="text-xl font-black text-gray-900">5명</span>
-            </div>
-            <div class="bg-emerald-50 p-3 rounded-2xl border border-emerald-200">
-              <span class="text-xs font-bold text-emerald-700 block">입금 완료</span>
-              <span id="club-stat-paid" class="text-xl font-black text-emerald-700">4명</span>
-            </div>
-            <div class="bg-purple-50 p-3 rounded-2xl border border-purple-200">
-              <span class="text-xs font-bold text-purple-700 block">QR 탑승완료</span>
-              <span id="club-stat-qr" class="text-xl font-black text-purple-700">2명</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- 2. 참석자 추가 & 입금·버스 호차 배정·QR 체크인 리스트 -->
-        <div class="card-box p-5 space-y-4">
-          <h3 class="font-black text-base text-gray-900">👥 참석자 명단 · 입금 · 호차 · QR 체크인 관리</h3>
-
-          <!-- 신규 참석자 빠른 등록 -->
-          <div class="flex gap-2">
-            <input id="new-member-name" type="text" placeholder="회원 닉네임/성함" class="flex-1 p-2.5 rounded-xl bg-gray-50 border text-sm font-bold" />
-            <select id="new-member-bus" class="p-2.5 rounded-xl bg-gray-50 border text-sm font-bold">
-              <option value="1호차">1호차</option>
-              <option value="2호차">2호차</option>
-            </select>
-            <button onclick="addClubMember()" class="px-4 py-2.5 rounded-xl bg-purple-800 text-white font-black text-xs shrink-0">
-              + 명단추가
-            </button>
-          </div>
-
-          <p class="text-xs text-gray-500 font-bold">👇 아래 버튼을 누르면 [입금 상태], [호차 배정], [QR 탑승 체크인]이 즉시 변경됩니다.</p>
-
-          <!-- 참석자 테이블 리스트 -->
-          <div id="club-member-list" class="space-y-2.5">
-            <!-- JS로 렌더링 -->
-          </div>
-        </div>
-
-        <!-- 3. 단체 공지사항 작성 및 단톡방 일괄 발송 -->
-        <div class="card-box p-5 space-y-3 border-2 border-purple-800">
-          <h3 class="font-black text-base text-gray-900">📢 총무 공지사항 작성 및 전체 카톡 발송</h3>
-          <textarea id="club-notice-text" rows="3" class="w-full p-3 rounded-xl bg-gray-50 border text-sm font-bold text-gray-800">[찬스 경남지부 공지] 11월 14일(토) 오전 9시 진주종합경기장 정문 앞 1호차·2호차 출발합니다. 탑승 시 총무에게 QR 체크인을 보여주세요!</textarea>
-          <button onclick="sendClubNoticeKakao()" class="w-full py-3.5 rounded-xl bg-purple-900 text-white font-black text-sm flex items-center justify-center gap-2 u-btn">
-            <i class="fa-solid fa-bullhorn"></i>
-            <span>공지사항 저장 & 회원 전체 카카오톡 공지 보내기</span>
-          </button>
-        </div>
-
-      </section>
-
-    </main>
-
-    <!-- ================= 하단 고정 5대 메뉴 내비게이션 바 ================= -->
-    <nav class="fixed bottom-0 w-full max-w-[500px] bg-white border-t-2 border-[#E6DFD3] px-1 py-2 grid grid-cols-5 text-center z-40 shadow-[0_-8px_20px_rgba(0,0,0,0.06)]">
-      <button onclick="switchMenu('menu-home')" id="bnav-menu-home" class="flex flex-col items-center py-1 text-[#EA580C] font-black">
-        <i class="fa-solid fa-house text-lg"></i>
-        <span class="text-[11px] mt-0.5">홈·선택</span>
-      </button>
-      <button onclick="switchMenu('menu-senior')" id="bnav-menu-senior" class="flex flex-col items-center py-1 text-gray-400 font-bold">
-        <i class="fa-solid fa-calendar-check text-lg"></i>
-        <span class="text-[11px] mt-0.5">간편예약</span>
-      </button>
-      <button onclick="switchMenu('menu-schedule')" id="bnav-menu-schedule" class="flex flex-col items-center py-1 text-gray-400 font-bold">
-        <i class="fa-solid fa-route text-lg"></i>
-        <span class="text-[11px] mt-0.5">동선·안내</span>
-      </button>
-      <button onclick="switchMenu('menu-child')" id="bnav-menu-child" class="flex flex-col items-center py-1 text-gray-400 font-bold">
-        <i class="fa-solid fa-heart-circle-check text-lg"></i>
-        <span class="text-[11px] mt-0.5">자녀안심</span>
-      </button>
-      <button onclick="switchMenu('menu-club')" id="bnav-menu-club" class="flex flex-col items-center py-1 text-gray-400 font-bold">
-        <i class="fa-solid fa-users-gear text-lg"></i>
-        <span class="text-[11px] mt-0.5">총무관리</span>
-      </button>
-    </nav>
-
-    <!-- ================= [모달 1: 실시간 예약 상태 확인 & QR 탑승권 보관함] ================= -->
-    <div id="myResModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
-      <div class="bg-white w-full max-w-[440px] rounded-3xl p-6 space-y-4 shadow-2xl border-2 border-[#EA580C] max-h-[85vh] flex flex-col">
-        <div class="flex justify-between items-center border-b pb-3">
-          <div>
-            <span class="bg-emerald-100 text-emerald-800 text-xs font-black px-2.5 py-0.5 rounded-full">실시간 예약 상태 확인</span>
-            <h3 class="text-xl font-black text-gray-900 mt-0.5">🎟️ 나의 예약 및 QR 체크인</h3>
-          </div>
-          <button onclick="closeMyReservationModal()" class="text-gray-400 text-3xl font-bold">&times;</button>
-        </div>
-        <div id="my-res-list" class="space-y-3 overflow-y-auto flex-1"></div>
-        <button onclick="closeMyReservationModal()" class="w-full py-3.5 rounded-xl bg-gray-900 text-white font-black text-sm">닫기</button>
-      </div>
-    </div>
-
-    <!-- ================= [모달 2: 관리자 페이지 (공연 등록 · 예약 확인 · DB 초기화)] ================= -->
-    <div id="adminModal" class="fixed inset-0 bg-black/65 z-50 hidden flex items-center justify-center p-4">
-      <div class="bg-white w-full max-w-[450px] rounded-3xl p-6 space-y-4 shadow-2xl border-2 border-gray-900 max-h-[88vh] overflow-y-auto">
-        <div class="flex justify-between items-center border-b pb-3">
-          <div>
-            <span class="bg-gray-900 text-amber-300 text-[10px] font-black px-2.5 py-0.5 rounded-full">ADMIN DASHBOARD</span>
-            <h3 class="text-lg font-black text-gray-900 mt-0.5">⚙️ 관리자 페이지 (공연·예약·DB 관리)</h3>
-          </div>
-          <button onclick="closeAdminModal()" class="text-gray-400 text-2xl font-bold">&times;</button>
-        </div>
-
-        <!-- 신규 공연 DB 등록 -->
-        <div class="bg-gray-50 p-4 rounded-2xl border space-y-2.5 text-xs">
-          <h4 class="font-black text-sm text-gray-900">➕ 신규 콘서트 데이터베이스 등록</h4>
-          <div class="grid grid-cols-2 gap-2">
-            <input id="adm-singer" type="text" placeholder="가수명 (예: 김호중)" class="p-2.5 rounded-lg border font-bold" />
-            <input id="adm-city" type="text" placeholder="지역 (예: 광주)" class="p-2.5 rounded-lg border font-bold" />
-          </div>
-          <input id="adm-date" type="text" placeholder="공연일시 (예: 12월 25일(금) 오후 5시)" class="w-full p-2.5 rounded-lg border font-bold" />
-          <input id="adm-venue" type="text" placeholder="공연장소 (예: 김대중컨벤션센터)" class="w-full p-2.5 rounded-lg border font-bold" />
-          <button onclick="adminAddConcert()" class="w-full py-2.5 rounded-xl bg-gray-900 text-white font-black">
-            공연 데이터베이스에 즉시 추가
-          </button>
-        </div>
-
-        <!-- 전체 예약 현황 관리 -->
-        <div class="space-y-2">
-          <div class="flex justify-between items-center">
-            <h4 class="font-black text-sm text-gray-900">📊 전체 고객 예약 DB 관리</h4>
-            <button onclick="resetAllDatabase()" class="text-xs font-bold text-rose-600 underline">초기 데이터로 리셋</button>
-          </div>
-          <div id="admin-res-list" class="space-y-2 text-xs max-h-48 overflow-y-auto"></div>
-        </div>
-
-        <button onclick="closeAdminModal()" class="w-full py-3 rounded-xl bg-gray-200 text-gray-800 font-black text-sm">관리자 창 닫기</button>
-      </div>
-    </div>
-
-    <!-- 토스트 알림창 -->
-    <div id="toastBox" class="fixed top-20 left-1/2 -translate-x-1/2 w-[90%] max-w-[400px] bg-gray-900 text-amber-300 px-5 py-3.5 rounded-2xl shadow-2xl text-sm font-black text-center z-50 hidden">
-      알림
-    </div>
-
-  </div>
-
-  <script>
-    // ================= 1. 체계적인 데이터베이스 (LocalStorage 영구 저장 연동) =================
-    const DEFAULT_CONCERTS = [
-      {
-        id: 'c1',
-        singer: '이찬원',
-        city: '대구',
-        title: '2026 이찬원 전국투어 콘서트 [대구]',
-        dates: ['11월 14일(토) 오후 5시', '11월 15일(일) 오후 4시'],
-        venue: '대구 엑스코(EXCO) 동관',
-        meetupSpot: '대구 엑스코 동관 3번 파란 기둥 앞 (노란 깃발)',
-        price: 59000,
-        origins: [
-          { name: '진주종합경기장 정문 앞 (09:30 출발)', time: '09:30' },
-          { name: '마산역 광장 시계탑 앞 (10:10 출발)', time: '10:10' },
-          { name: '동대구역 3번 출구 마중 픽업 (11:30 출발)', time: '11:30' }
-        ],
-        timeline: [
-          { time: '09:30 ~ 11:30', title: '출발지 탑승 및 동대구역 집결', desc: '인솔 매니저 탑승 확인 및 생수·간식 배부' },
-          { time: '12:00 ~ 13:30', title: '점심 식사: 안지랑 곱창골목 참숯막창 & 따로국밥', desc: '대기 줄 없이 사전 예약된 의자 전용석에서 편안한 식사' },
-          { time: '14:00 ~ 15:30', title: '문화 체험: 대구 약령시 한방 향주머니 공방 & 찻집', desc: '공연 전 다리 안 아프게 앉아서 즐기는 공방 체험 및 다과' },
-          { time: '16:00 ~ 17:00', title: '공연장 도착 및 안 붐비는 2층 화장실 안내', desc: '매니저가 티켓 확인 후 공연장 좌석 구역까지 안전 안내' },
-          { time: '17:00 ~ 19:30', title: '2026 이찬원 대구 콘서트 관람', desc: '신나는 콘서트 관람 (인솔자는 외부 비상 대기)' },
-          { time: '19:40 ~ 21:30', title: '동관 3번 기둥 집결 후 귀가 버스 출발', desc: '탑승 인원 전원 출석 체크 후 출발지로 안전 귀가' }
-        ]
-      },
-      {
-        id: 'c2',
-        singer: '임영웅',
-        city: '부산',
-        title: '2026 임영웅 콘서트 IM HERO [부산]',
-        dates: ['11월 28일(토) 오후 6시', '11월 29일(일) 오후 5시'],
-        venue: '부산 벡스코(BEXCO) 제1전시장',
-        meetupSpot: '부산 벡스코 제1전시장 정문 국기게양대 앞',
-        price: 59000,
-        origins: [
-          { name: '진주 개양오거리 버스정류장 (09:30 출발)', time: '09:30' },
-          { name: '창원 종합버스터미널 앞 (10:15 출발)', time: '10:15' },
-          { name: '부산역(KTX) 1번 출구 마중 픽업 (11:30 출발)', time: '11:30' }
-        ],
-        timeline: [
-          { time: '09:30 ~ 11:30', title: '출발지 탑승 및 부산역 마중 집결', desc: '하늘빛 응원 스카프 배부 및 안전벨트 확인' },
-          { time: '12:00 ~ 13:30', title: '점심 식사: 해운대 소문난 암소갈비 & 통대구탕', desc: '사전 예약된 입식 룸에서 대기 없이 든든한 보양 식사' },
-          { time: '14:00 ~ 16:00', title: '오션뷰 휴식: 영도 하늘빛 성지 카페 & 자개공방', desc: '부산 바다를 보며 차 한잔과 자개 손거울 만들기' },
-          { time: '16:30 ~ 18:00', title: '부산 벡스코 도착 및 좌석 착석 안내', desc: '2층 한산한 화장실 이용 후 공연장 안전 입장' },
-          { time: '18:00 ~ 20:30', title: '2026 임영웅 부산 콘서트 관람', desc: '감동의 콘서트 관람' },
-          { time: '20:40 ~ 22:30', title: '정문 국기게양대 앞 집결 후 안전 귀가', desc: '전원 탑승 확인 및 자녀 안심 귀가 알림 발송' }
-        ]
-      },
-      {
-        id: 'c3',
-        singer: '장민호',
-        city: '전주',
-        title: '2026 장민호 전국투어 호시절 [전주]',
-        dates: ['12월 05일(토) 오후 5시', '12월 06일(일) 오후 4시'],
-        venue: '전주 한국소리문화의전당 모악당',
-        meetupSpot: '모악당 중앙 계단 오른쪽 시계탑 앞',
-        price: 59000,
-        origins: [
-          { name: '진주종합경기장 정문 앞 (09:00 출발)', time: '09:00' },
-          { name: '광주 유스퀘어 터미널 앞 (10:00 출발)', time: '10:00' },
-          { name: '전주역(KTX) 마중 픽업 (11:30 출발)', time: '11:30' }
-        ],
-        timeline: [
-          { time: '09:00 ~ 11:30', title: '출발지 탑승 및 전주역 집결', desc: '전주행 우등버스 편안한 이동' },
-          { time: '12:00 ~ 13:30', title: '점심 식사: 전주 한옥마을 한우육회비빔밥 반상', desc: '편스토랑 극찬 메뉴, 신발 안 벗는 의자 좌석 완비' },
-          { time: '14:00 ~ 15:30', title: '문화 체험: 전주 한지 응원부채 만들기 & 전통찻집', desc: '고즈넉한 한옥 찻집에서 배도라지차 휴식' },
-          { time: '16:00 ~ 19:30', title: '공연장 입장 및 장민호 전주 콘서트 관람', desc: '좌석 안내 및 공연 관람' },
-          { time: '19:40 ~ 21:50', title: '시계탑 앞 집결 후 출발지로 안전 귀가', desc: '전원 귀가 에스코트' }
-        ]
-      },
-      {
-        id: 'c4',
-        singer: '영탁',
-        city: '안동',
-        title: '2026 영탁 단독 콘서트 TAK SHOW [안동]',
-        dates: ['12월 19일(토) 오후 5시', '12월 20일(일) 오후 4시'],
-        venue: '안동 실내체육관 특설무대',
-        meetupSpot: '안동 실내체육관 남문 대형버스 주차장 1번 구역',
-        price: 59000,
-        origins: [
-          { name: '부산 서면역 12번 출구 (09:00 출발)', time: '09:00' },
-          { name: '대구 동대구역 마중 픽업 (10:15 출발)', time: '10:15' },
-          { name: '안동역(KTX) 마중 픽업 (11:30 출발)', time: '11:30' }
-        ],
-        timeline: [
-          { time: '09:00 ~ 11:30', title: '출발지 탑승 및 안동역 집결', desc: '신나는 영탁 플레이리스트와 함께 이동' },
-          { time: '12:00 ~ 13:30', title: '점심 식사: 안동 갈비골목 원조 마늘 한우갈비', desc: '영탁 고향 단골집 전용 룸 식사 및 안동식혜 후식' },
-          { time: '14:00 ~ 15:30', title: '월영교 호수뷰 성지 카페 & 전통식혜 공방', desc: '월영교 평지 산책 및 다과 휴식' },
-          { time: '16:00 ~ 19:30', title: '공연장 착석 및 영탁 안동 콘서트 관람', desc: '안심 착석 확인 후 공연 관람' },
-          { time: '19:40 ~ 21:50', title: '남문 주차장 집결 후 안전 귀가', desc: '출발지까지 안전 운행' }
-        ]
-      }
-    ];
-
-    const DEFAULT_CLUB_MEMBERS = [
-      { id: 1, name: '박순자 (진주)', paid: true, bus: '1호차', qrChecked: true },
-      { id: 2, name: '김영숙 (마산)', paid: true, bus: '1호차', qrChecked: true },
-      { id: 3, name: '이정자 (창원)', paid: true, bus: '1호차', qrChecked: false },
-      { id: 4, name: '최미경 (진주)', paid: false, bus: '2호차', qrChecked: false },
-      { id: 5, name: '정옥순 (사천)', paid: true, bus: '2호차', qrChecked: false }
-    ];
-
-    // DB 로드 및 저장
-    let concertsDB = JSON.parse(localStorage.getItem('tt_concerts')) || DEFAULT_CONCERTS;
-    let reservationsDB = JSON.parse(localStorage.getItem('tt_reservations')) || [];
-    let clubMembersDB = JSON.parse(localStorage.getItem('tt_club_members')) || DEFAULT_CLUB_MEMBERS;
-
-    function saveDB() {
-      localStorage.setItem('tt_concerts', JSON.stringify(concertsDB));
-      localStorage.setItem('tt_reservations', JSON.stringify(reservationsDB));
-      localStorage.setItem('tt_club_members', JSON.stringify(clubMembersDB));
-      updateHeaderBadge();
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel" data-presets="react,typescript">
+    const { useState, useEffect, useMemo } = React;
+
+    // ================= TypeScript 인터페이스 정의 =================
+    type MenuKey = 'home' | 'concert' | 'local' | 'map' | 'premium' | 'guide' | 'fanclub' | 'gov';
+    type StayType = '당일형' | '1박 2일' | '2박 3일';
+    type RecommendType = '방송소개(출처확인)' | '팬추천' | '지역공식추천';
+    type SpotCategory = '맛집' | '관광지' | '전통시장' | '숙박';
+
+    interface ConcertTour {
+      id: string;
+      singer: string;
+      city: string;
+      title: string;
+      dates: string[];
+      venue: string;
+      meetupSpot: string;
+      shuttleOrigins: { name: string; time: string }[];
+      packages: {
+        type: StayType;
+        price: number;
+        summary: string;
+        includes: string[];
+        schedule: string[];
+      }[];
     }
 
-    // 현재 선택 상태 변수
-    let selConcertIdx = 0;
-    let selDateIdx = 0;
-    let selOriginIdx = 0;
-    let selSeniorPax = 1;
-    let selChildPkg = 'basic';
-    let boardingStep = 2; // 0:대기, 1:버스탑승, 2:식사완료, 3:공연장착석, 4:귀가출발
+    interface LocalSpot {
+      id: string;
+      city: string;
+      category: SpotCategory;
+      name: string;
+      recType: RecommendType;
+      recSource: string; // 허위 표시 방지를 위한 명확한 출처
+      signature: string;
+      priceText: string;
+      hours: string;
+      address: string;
+      kakaoQuery: string;
+      latOffset: number;
+      lngOffset: number;
+      seniorFriendly: string[];
+    }
 
-    // ================= 2. 메뉴 탭 전환 (5개 독립 페이지 전환) =================
-    const MENU_IDS = ['menu-home', 'menu-senior', 'menu-schedule', 'menu-child', 'menu-club'];
-    function switchMenu(targetId) {
-      MENU_IDS.forEach(id => {
-        const sec = document.getElementById(id);
-        const topBtn = document.getElementById('top-' + id);
-        const bnavBtn = document.getElementById('bnav-' + id);
+    interface YouthGuide {
+      id: string;
+      name: string;
+      age: number;
+      region: string;
+      specialty: string;
+      verifiedHistory: string[]; // 확인된 교육·자격 이력만 표시
+      courseTitle: string;
+      availableDates: string[];
+      activityCount: number;
+      rating: number;
+      reviews: { author: string; text: string; isDemo: boolean }[];
+    }
 
-        if (id === targetId) {
-          sec.classList.remove('hidden');
-          topBtn.className = 'py-2 rounded-xl brand-orange text-white font-black text-xs flex flex-col items-center gap-0.5 shadow-xs';
-          bnavBtn.className = 'flex flex-col items-center py-1 text-[#EA580C] font-black';
-        } else {
-          sec.classList.add('hidden');
-          topBtn.className = 'py-2 rounded-xl text-gray-500 font-bold text-xs flex flex-col items-center gap-0.5';
-          bnavBtn.className = 'flex flex-col items-center py-1 text-gray-400 font-bold';
+    interface ReservationRecord {
+      id: string;
+      category: string;
+      title: string;
+      guestName: string;
+      maskedPhone: string;
+      date: string;
+      stayType: string;
+      origin: string;
+      pax: number;
+      totalPrice: string;
+      status: string;
+      qrChecked: boolean;
+      isDemo: boolean;
+    }
+
+    // ================= Lucide 아이콘 래퍼 컴포넌트 =================
+    const Icon = ({ name, className = "w-5 h-5" }: { name: string; className?: string }) => {
+      useEffect(() => {
+        if ((window as any).lucide) {
+          (window as any).lucide.createIcons();
         }
       });
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+      return <i data-lucide={name} className={className}></i>;
+    };
 
-    // 큰글씨 접근성 모드
-    let isLarge = false;
-    function toggleLargeMode() {
-      isLarge = !isLarge;
-      document.body.classList.toggle('large-mode', isLarge);
-      document.getElementById('largeBtn').innerText = isLarge ? '원래글씨' : '큰글씨+';
-      showToast(isLarge ? '👀 어르신 맞춤 큰 글씨 모드가 켜졌습니다!' : '기본 글씨 크기로 변경되었습니다.');
-    }
-
-    // 한국어 음성 안내 (TTS)
-    function speakText(text) {
-      if (!('speechSynthesis' in window)) {
-        showToast(text);
-        return;
+    // 개인정보 보호: 전화번호 자동 마스킹 함수
+    const maskPhoneNumber = (phone: string): string => {
+      const cleaned = phone.replace(/[^0-9]/g, '');
+      if (cleaned.length >= 10) {
+        return `${cleaned.slice(0, 3)}-****-${cleaned.slice(-4)}`;
       }
-      window.speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(text);
-      u.lang = 'ko-KR';
-      u.rate = 0.94;
-      window.speechSynthesis.speak(u);
-      showToast('🔊 음성으로 안내해 드리고 있습니다.');
-    }
+      return '010-****-0000';
+    };
 
-    function speakSeniorGuide() {
-      const c = concertsDB[selConcertIdx];
-      speakText(`어르신 간편 예약 화면입니다. 첫 번째로 ${c.singer} 가수를 누르시고, 두 번째로 날짜, 세 번째로 출발 장소, 네 번째로 인원을 누르신 뒤 맨 아래 주황색 예약 완료 버튼을 누르시면 됩니다.`);
-    }
+    // ================= 초기 데이터베이스 (실제 확인 정보 & 시연용 데이터 명확 구분) =================
+    const INITIAL_CONCERTS: ConcertTour[] = [
+      {
+        id: 'c-daegu',
+        singer: '이찬원',
+        city: '대구',
+        title: '대구 콘서트 & 로컬 체류형 투어',
+        dates: ['2026.11.14 (토) 17:00', '2026.11.15 (일) 16:00'],
+        venue: '대구 엑스코(EXCO) 동관',
+        meetupSpot: '엑스코 동관 3번 파란 기둥 앞 (노란 깃발)',
+        shuttleOrigins: [
+          { name: '진주종합경기장 정문 앞', time: '09:30 출발' },
+          { name: '마산역 광장 시계탑 앞', time: '10:15 출발' },
+          { name: '동대구역(KTX) 3번 출구 마중 픽업', time: '11:30 집결' }
+        ],
+        packages: [
+          {
+            type: '당일형',
+            price: 59000,
+            summary: '왕복 셔틀 + 안지랑 막창/국밥 중식 + 약령시 공방 + 공연장 이동',
+            includes: ['전용 우등셔틀 왕복', '중식 1회(사전예약석)', '약령시 향주머니 체험', '1억 여행자보험'],
+            schedule: ['09:30 거점 출발 / 11:30 동대구역 집결', '12:00 안지랑 곱창골목 또는 국일따로국밥 중식', '14:00 약령시 한방문화거리 체험', '16:00 엑스코 도착 및 화장실·좌석 안내', '19:40 공연 종료 후 집결 및 귀가']
+          },
+          {
+            type: '1박 2일',
+            price: 149000,
+            summary: '당일 코스 + 대구 4성급 비즈니스 호텔 숙박 + 서문시장·송해공원 투어',
+            includes: ['왕복 셔틀 및 2일차 전용버스', '제휴 호텔 1박(2인 1실, 조식포함)', '식사 3회', '서문시장 온누리상품권 1만원'],
+            schedule: ['[1일차] 중식 → 약령시 체험 → 콘서트 관람 → 호텔 체크인 및 휴식', '[2일차] 호텔 조식 → 달성 송해공원 평지 산책 → 서문시장 전통시장 투어 및 중식 → 15:00 귀가 출발']
+          },
+          {
+            type: '2박 3일',
+            price: 239000,
+            summary: '대구·경북 완전 정복! 콘서트 + 서문시장 + 근대골목 + 팔공산 케이블카 체류형',
+            includes: ['전 일정 전용차량/우등버스', '호텔 2박(조식포함)', '지역 특식 5회', '팔공산 케이블카 및 근대골목 해설사 동행'],
+            schedule: ['[1일차] 동대구 집결 → 중식 → 콘서트 관람 → 수성못 야경 및 숙박', '[2일차] 달성 송해공원 → 서문시장 미식투어 → 대구 근대골목 투어 및 숙박', '[3일차] 팔공산 케이블카 관람 → 한방 백숙 중식 → 15:00 안전 귀가']
+          }
+        ]
+      },
+      {
+        id: 'c-busan',
+        singer: '임영웅',
+        city: '부산',
+        title: '부산 콘서트 & 오션뷰 체류형 투어',
+        dates: ['2026.11.28 (토) 18:00', '2026.11.29 (일) 17:00'],
+        venue: '부산 벡스코(BEXCO) 제1전시장',
+        meetupSpot: '벡스코 제1전시장 정문 국기게양대 앞',
+        shuttleOrigins: [
+          { name: '진주 개양오거리 정류장', time: '09:30 출발' },
+          { name: '창원 종합버스터미널 앞', time: '10:15 출발' },
+          { name: '부산역(KTX) 1번 출구 마중 픽업', time: '11:30 집결' }
+        ],
+        packages: [
+          {
+            type: '당일형',
+            price: 59000,
+            summary: '왕복 셔틀 + 해운대 갈비/대구탕 중식 + 광안리 자개공방 + 공연장 이동',
+            includes: ['왕복 셔틀버스', '중식 1회(입식 예약석)', '자개 손거울 공방 체험', '1억 여행자보험'],
+            schedule: ['09:30 출발 / 11:30 부산역 집결', '12:10 해운대 중식', '14:30 광안리 자개공방 체험', '16:30 벡스코 도착 및 입장 안내', '20:40 공연 후 집결 및 귀가']
+          },
+          {
+            type: '1박 2일',
+            price: 159000,
+            summary: '콘서트 관람 + 해운대 오션뷰 호텔 1박 + 국제시장·자갈치시장·영도 투어',
+            includes: ['전 일정 이동버스', '해운대 호텔 1박(조식포함)', '식사 3회', '자갈치·국제시장 투어'],
+            schedule: ['[1일차] 부산 도착 및 중식 → 콘서트 관람 → 해운대 호텔 숙박', '[2일차] 해운대 해변 산책 및 대구탕 조식 → 영도 흰여울길 카페 → 자갈치·국제시장 쇼핑 → 귀가']
+          },
+          {
+            type: '2박 3일',
+            price: 249000,
+            summary: '부산 바다 완전 정복! 해운대 해변열차 + 영도 유람선 + 기장 미식 2박 3일',
+            includes: ['전 일정 전용버스', '호텔 2박', '특식 5회', '해운대 블루라인파크 해변열차 탑승권'],
+            schedule: ['[1일차] 중식 → 콘서트 관람 → 광안리 야경 및 숙박', '[2일차] 해운대 해변열차 탑승 → 기장 해물한상 중식 → 국제시장 투어', '[3일차] 영도 태종대 다누비열차 → 부산역 복귀 및 귀가']
+          }
+        ]
+      },
+      {
+        id: 'c-jeonju',
+        singer: '장민호',
+        city: '전주',
+        title: '전주 콘서트 & 한옥마을 미식 투어',
+        dates: ['2026.12.05 (토) 17:00', '2026.12.06 (일) 16:00'],
+        venue: '전주 한국소리문화의전당 모악당',
+        meetupSpot: '모악당 중앙 계단 우측 시계탑 앞',
+        shuttleOrigins: [
+          { name: '진주종합경기장 정문 앞', time: '09:00 출발' },
+          { name: '광주 유스퀘어 터미널 앞', time: '10:00 출발' },
+          { name: '전주역(KTX) 마중 픽업', time: '11:30 집결' }
+        ],
+        packages: [
+          {
+            type: '당일형',
+            price: 59000,
+            summary: '왕복 셔틀 + 전주 한우육회비빔밥 + 한지 부채 공방 + 공연장 이동',
+            includes: ['왕복 셔틀', '전주 종가 비빔밥 중식', '한지 응원부채 체험', '1억 여행자보험'],
+            schedule: ['09:00 출발 / 11:30 전주역 집결', '12:00 한옥마을 비빔밥 중식', '14:00 한지 부채 공방 및 전통찻집', '16:00 모악당 도착 및 공연 관람', '19:40 귀가 출발']
+          },
+          {
+            type: '1박 2일',
+            price: 145000,
+            summary: '콘서트 + 전주 한옥스테이(침대형) 1박 + 남부시장 콩나물국밥 투어',
+            includes: ['왕복 버스', '고급 한옥호텔 1박(침대방 보장)', '식사 3회', '전주 남부시장 투어'],
+            schedule: ['[1일차] 전주 중식 → 한지공방 → 콘서트 관람 → 한옥호텔 숙박', '[2일차] 남부시장 현대옥 콩나물국밥 조식 → 경기전 평지 산책 → 전주 모주·풍년제과 쇼핑 후 귀가']
+          },
+          {
+            type: '2박 3일',
+            price: 229000,
+            summary: '전주 한옥마을 + 군산 근대역사거리 + 남원 광한루원 효도 투어',
+            includes: ['전 일정 전용버스', '숙박 2박', '전라도 한정식 등 식사 5회', '전 입장권 포함'],
+            schedule: ['[1일차] 전주 도착 및 콘서트 관람', '[2일차] 전주 한옥마을 및 남부시장 → 군산 경암동·근대역사박물관 투어', '[3일차] 남원 광한루원 평지 산책 → 추어탕 중식 후 귀가']
+          }
+        ]
+      },
+      {
+        id: 'c-andong',
+        singer: '영탁',
+        city: '안동',
+        title: '안동 콘서트 & 전통문화 체류형 투어',
+        dates: ['2026.12.19 (토) 17:00', '2026.12.20 (일) 16:00'],
+        venue: '안동 실내체육관 특설무대',
+        meetupSpot: '안동 실내체육관 남문 대형버스 주차장 1번 구역',
+        shuttleOrigins: [
+          { name: '부산 서면역 12번 출구', time: '09:00 출발' },
+          { name: '동대구역(KTX) 마중 픽업', time: '10:15 출발' },
+          { name: '안동역(KTX) 마중 픽업', time: '11:30 집결' }
+        ],
+        packages: [
+          {
+            type: '당일형',
+            price: 59000,
+            summary: '왕복 셔틀 + 안동 마늘갈비 중식 + 월영교 산책 + 공연장 이동',
+            includes: ['왕복 셔틀', '안동 갈비골목 중식', '전통 안동식혜 체험', '1억 여행자보험'],
+            schedule: ['09:00 출발 / 11:30 안동역 집결', '12:00 안동 구시장 갈비골목 중식', '14:00 월영교 호수 산책 및 찻집', '16:00 공연장 입장 및 관람', '19:40 귀가 출발']
+          },
+          {
+            type: '1박 2일',
+            price: 149000,
+            summary: '콘서트 + 안동 리조트/호텔 1박 + 안동구시장 + 하회마을 투어',
+            includes: ['전 일정 버스', '안동 스탠포드/리조트 1박', '식사 3회(헛제삿밥·찜닭 포함)', '하회마을 입장권'],
+            schedule: ['[1일차] 안동 마늘갈비 중식 → 콘서트 관람 → 월영교 야경 및 숙박', '[2일차] 월영교 양반가 헛제삿밥 → 안동 하회마을 평지 관람 → 안동구시장 찜닭골목 투어 후 귀가']
+          },
+          {
+            type: '2박 3일',
+            price: 235000,
+            summary: '안동 하회마을 + 도산서원 + 영주 부석사·풍기인삼시장 힐링 2박 3일',
+            includes: ['전 일정 버스', '숙박 2박', '식사 5회', '전담 문화해설 동행'],
+            schedule: ['[1일차] 안동 도착 및 콘서트 관람', '[2일차] 안동 하회마을 → 도산서원 → 안동구시장 미식 투어', '[3일차] 영주 부석사 및 풍기인삼시장 쇼핑 후 안전 귀가']
+          }
+        ]
+      }
+    ];
 
-    function speakScheduleGuide() {
-      const c = concertsDB[selConcertIdx];
-      speakText(`${c.title} 당일 일정입니다. 오전 출발 후 점심에는 대기 없이 사전 예약된 식당에서 식사하시고, 오후에 공연을 관람하신 뒤 ${c.meetupSpot}에서 귀가 버스에 탑승합니다.`);
-    }
+    // 지역 관광 DB (허위 추천 방지를 위해 방송소개 출처 / 팬추천 / 지역공식추천 명확히 구분)
+    const LOCAL_SPOTS: LocalSpot[] = [
+      // 대구
+      {
+        id: 'sp-1', city: '대구', category: '맛집', name: '안지랑 곱창골목 참숯생막창',
+        recType: '방송소개(출처확인)', recSource: 'SBS 미운우리새끼·KBS 편스토랑 대구 고향 소울푸드 언급',
+        signature: '참숯 초벌 생막창 + 된장말이밥', priceText: '1인 14,000원~', hours: '12:00 ~ 23:00 (공연일 낮 특별오픈)',
+        address: '대구 남구 대명로36길 일대', kakaoQuery: '대구 안지랑 곱창골목', latOffset: -25, lngOffset: -30,
+        seniorFriendly: ['신발 안 벗는 입식 의자석', '초벌구이로 연기 최소화', '대형버스 정차 가능']
+      },
+      {
+        id: 'sp-2', city: '대구', category: '맛집', name: '70년 전통 국일따로국밥',
+        recType: '지역공식추천', recSource: '대구광역시 지정 전통 대폿집·백년가게 인증 노포',
+        signature: '한우 사골 선지 따로국밥 특', priceText: '11,000원', hours: '00:00 ~ 24:00 (연중무휴)',
+        address: '대구 중구 국채보상로 571', kakaoQuery: '대구 국일따로국밥', latOffset: 20, lngOffset: -25,
+        seniorFriendly: ['어르신 속 편한 사골국물', '1층 평지 매장', '전 좌석 입식 테이블']
+      },
+      {
+        id: 'sp-3', city: '대구', category: '관광지', name: '달성 옥포 송해공원 둘레길',
+        recType: '팬추천', recSource: '전국 트로트 팬덤 성지순례 방문 만족도 1위 명소',
+        signature: '옥연지 백세교 평지 산책로 & 풍차 전망대', priceText: '입장료 무료', hours: '상시 개방 (야간 조명 운영)',
+        address: '대구 달성군 옥포읍 기세리 306', kakaoQuery: '대구 송해공원', latOffset: -30, lngOffset: 30,
+        seniorFriendly: ['계단 없는 평지 데크길', '깨끗한 공원 화장실 다수', '곳곳에 벤치 쉼터 완비']
+      },
+      {
+        id: 'sp-4', city: '대구', category: '전통시장', name: '대구 서문시장 & 약령시 한방거리',
+        recType: '지역공식추천', recSource: '한국관광 100선 선정 영남권 최대 전통시장',
+        signature: '칼제비·납작만두·한방 향주머니 공방 체험', priceText: '온누리상품권 가맹', hours: '09:00 ~ 21:00',
+        address: '대구 중구 큰장로26길 45', kakaoQuery: '대구 서문시장', latOffset: 15, lngOffset: 25,
+        seniorFriendly: ['관광안내소 휠체어·돋보기 대여', '엘리베이터 주차빌딩 완비']
+      },
+      {
+        id: 'sp-5', city: '대구', category: '숙박', name: '대구 엑스코 인터불고 제휴 호텔',
+        recType: '지역공식추천', recSource: '대구 북구 공식 컨벤션 제휴 4성급 숙소',
+        signature: '공연장 도보 5분 트윈/온돌 객실 + 조식 뷔페', priceText: '1박 110,000원~ (제휴가)', hours: '체크인 15:00 / 체크아웃 11:00',
+        address: '대구 북구 유통단지로 80', kakaoQuery: '대구 호텔인터불고 엑스코', latOffset: -5, lngOffset: 10,
+        seniorFriendly: ['공연 종료 후 도보 5분 이동', '욕실 미끄럼 방지 매트 구비']
+      },
+      // 부산
+      {
+        id: 'sp-6', city: '부산', category: '맛집', name: '해운대 소문난 암소갈비집',
+        recType: '지역공식추천', recSource: '부산 해운대구 60년 전통 향토음식점 공식 지정',
+        signature: '한우 생갈비·양념갈비 & 감자사리 육수전골', priceText: '1인 42,000원~', hours: '11:30 ~ 22:00',
+        address: '부산 해운대구 중동2로10번길 32-10', kakaoQuery: '해운대 소문난암소갈비집', latOffset: -20, lngOffset: 25,
+        seniorFriendly: ['치아에 부담 없는 부드러운 육질', '사전 예약 입식 룸']
+      },
+      {
+        id: 'sp-7', city: '부산', category: '전통시장', name: '부산 국제시장 & 자갈치시장',
+        recType: '지역공식추천', recSource: '부산관광공사 공식 추천 체류형 대표 전통시장',
+        signature: '씨앗호떡·유부주머니·건어물 특산품 쇼핑', priceText: '온누리상품권 사용 가능', hours: '09:00 ~ 20:00',
+        address: '부산 중구 신창동4가 일대', kakaoQuery: '부산 국제시장', latOffset: 25, lngOffset: -20,
+        seniorFriendly: ['평지 아케이드 통로', '공영주차장 및 현대식 화장실 완비']
+      },
+      {
+        id: 'sp-8', city: '부산', category: '관광지', name: '영도 흰여울문화마을 오션뷰 다원',
+        recType: '팬추천', recSource: '부산 콘서트 방문 팬덤 오션뷰 성지 코멘트 다수',
+        signature: '부산 남항 바다 전망 산책 및 전통 유자차', priceText: '음료 6,500원~', hours: '10:00 ~ 20:00',
+        address: '부산 영도구 영선동4가', kakaoQuery: '부산 흰여울문화마을', latOffset: 30, lngOffset: 20,
+        seniorFriendly: ['해안 도로 차량 바로 하차 가능', '바다 전망 의자 좌석']
+      },
+      {
+        id: 'sp-9', city: '부산', category: '숙박', name: '해운대 센텀 제휴 비즈니스 호텔',
+        recType: '지역공식추천', recSource: '벡스코 공연장 반경 500m 내 우수 숙박업소',
+        signature: '벡스코 도보권 트윈베드 객실 + 한식 조식', priceText: '1박 120,000원~', hours: '체크인 15:00 / 체크아웃 11:00',
+        address: '부산 해운대구 센텀남대로 인근', kakaoQuery: '부산 센텀호텔', latOffset: -10, lngOffset: -15,
+        seniorFriendly: ['공연장 도보 이동 가능', '방음 및 난방 우수']
+      },
+      // 전주 & 안동 대표 스팟
+      {
+        id: 'sp-10', city: '전주', category: '맛집', name: '전주 한옥마을 한우육회비빔밥 종가',
+        recType: '방송소개(출처확인)', recSource: 'KBS 신상출시 편스토랑 전주 미나리 육회비빔밥 편 소개',
+        signature: '미나리 한우육회비빔밥 & 소고기무국 반상', priceText: '16,000원', hours: '10:30 ~ 21:00',
+        address: '전북 전주시 완산구 전동 한옥마을길', kakaoQuery: '전주 한옥마을 육회비빔밥', latOffset: -20, lngOffset: -20,
+        seniorFriendly: ['신발 안 벗는 입식 테이블', '소화 잘되는 나물 반상']
+      },
+      {
+        id: 'sp-11', city: '전주', category: '전통시장', name: '전주 남부시장 & 청년몰',
+        recType: '지역공식추천', recSource: '전주시청 공식 지정 전통시장 및 콩나물국밥 거리',
+        signature: '전주 남부시장식 콩나물국밥 + 수란', priceText: '9,000원~', hours: '06:00 ~ 21:00',
+        address: '전북 전주시 완산구 풍남문2길 63', kakaoQuery: '전주 남부시장', latOffset: 25, lngOffset: 15,
+        seniorFriendly: ['아침 일찍 식사 가능', '1층 평지 동선']
+      },
+      {
+        id: 'sp-12', city: '안동', category: '맛집', name: '안동 구시장 마늘한우갈비 골목',
+        recType: '방송소개(출처확인)', recSource: '안동 출신 가수 고향 방문 방송 및 향토음식 거리 소개',
+        signature: '안동 특산 마늘 양념 소갈비 & 갈비찜', priceText: '1인 30,000원~', hours: '11:30 ~ 21:30',
+        address: '경북 안동시 경동로 677 일대', kakaoQuery: '안동 갈비골목', latOffset: -15, lngOffset: 25,
+        seniorFriendly: ['직원이 구워주는 서비스', '소화에 좋은 안동식혜 후식 제공']
+      }
+    ];
 
-    // ================= 3. [메뉴 2] 어르신 4단계 간편 예약 렌더링 =================
-    function renderSeniorStep1Singers() {
-      const box = document.getElementById('senior-singer-grid');
-      box.innerHTML = '';
-      concertsDB.forEach((c, idx) => {
-        const active = idx === selConcertIdx;
-        box.insertAdjacentHTML('beforeend', `
-          <button onclick="selectConcert(${idx})" class="p-4 rounded-2xl text-left transition flex justify-between items-center u-btn ${active ? 'border-3 border-[#EA580C] bg-orange-50 font-black shadow-xs' : 'border-2 border-gray-200 bg-white font-bold text-gray-700'}">
-            <div>
-              <span class="text-xs text-[#EA580C] font-black block">${c.city} 콘서트</span>
-              <span class="text-lg font-black text-gray-900">${c.singer}</span>
-            </div>
-            <i class="fa-solid fa-circle-check text-xl ${active ? 'text-[#EA580C]' : 'text-gray-200'}"></i>
-          </button>
-        `);
+    // 청년 가이드 DB (허위 경력 배제, 확인된 교육 수료 이력 및 시연용 배지 구분)
+    const YOUTH_GUIDES: YouthGuide[] = [
+      {
+        id: 'g-1',
+        name: '김민지 가이드',
+        age: 26,
+        region: '대구 · 경북권',
+        specialty: '시니어 안심 케어 · 약령시/서문시장 미식 해설',
+        verifiedHistory: [
+          '[확인됨] 대구관광재단 청년 로컬가이드 양성 과정 수료 (32시간)',
+          '[확인됨] 대한적십자사 응급처치 및 심폐소생술(CPR) 교육 수료',
+          '[확인됨] TRIPTROT 시니어 동행 표준 매뉴얼 실습 이수'
+        ],
+        courseTitle: '동대구역 마중 → 안지랑/약령시 → 엑스코 좌석 에스코트',
+        availableDates: ['11월 14일(토)', '11월 15일(일)', '11월 21일(토)'],
+        activityCount: 18,
+        rating: 4.9,
+        reviews: [
+          { author: '박O숙 님 자녀 (서울)', text: '어머니 혼자 대구 공연 보내드려 걱정했는데, 기차역 마중부터 좌석 착석까지 카톡으로 알려주셔서 정말 안심됐습니다.', isDemo: true },
+          { author: '이O자 어르신 (진주)', text: '걸음 속도에 맞춰 천천히 안내해 주고 덜 붐비는 2층 화장실까지 챙겨줘서 고마웠어요.', isDemo: true }
+        ]
+      },
+      {
+        id: 'g-2',
+        name: '박준영 가이드',
+        age: 28,
+        region: '부산 · 경남권',
+        specialty: '가족 전용차량 안전운행 · 해운대/국제시장 스토리텔링',
+        verifiedHistory: [
+          '[확인됨] 부산관광공사 로컬 크리에이터 아카데미 수료',
+          '[확인됨] 1종 보통 운전면허 및 무사고 운전경력 증명 확인 (5년)',
+          '[확인됨] 관광통역안내 및 국내여행안내 실무 교육 이수'
+        ],
+        courseTitle: '부산역 픽업 → 해운대 암소갈비 → 영도 바다뷰 → 벡스코 동행',
+        availableDates: ['11월 28일(토)', '11월 29일(일)', '12월 05일(토)'],
+        activityCount: 24,
+        rating: 4.95,
+        reviews: [
+          { author: '최O호 님 (부산 효도예약)', text: '부모님 두 분 모시고 1박 2일 다녀오셨는데 운전도 너무 편안하고 사진도 정성껏 찍어주셨습니다.', isDemo: true }
+        ]
+      },
+      {
+        id: 'g-3',
+        name: '정소연 가이드',
+        age: 25,
+        region: '전주 · 안동 문화권',
+        specialty: '전통문화·한옥마을 해설 · 부모님 스냅 사진 촬영',
+        verifiedHistory: [
+          '[확인됨] 지자체 청년 문화관광 해설 아카데미 기초과정 수료',
+          '[확인됨] 시니어 친화 디지털 길안내 봉사단 활동 수료 (40시간)'
+        ],
+        courseTitle: '전주역/안동역 마중 → 종가 맛집 → 전통공방 체험 → 공연장 동행',
+        availableDates: ['12월 05일(토)', '12월 06일(일)', '12월 19일(토)'],
+        activityCount: 15,
+        rating: 4.88,
+        reviews: [
+          { author: '김O순 어르신 (광주)', text: '한지 부채 만들 때도 옆에서 도와주고 공연 끝나고 밤길에 버스까지 손잡고 데려다줘서 든든했습니다.', isDemo: true }
+        ]
+      }
+    ];
+
+    // ================= 메인 애플리케이션 컴포넌트 =================
+    const App = () => {
+      const [activeMenu, setActiveMenu] = useState<MenuKey>('home');
+      const [isLargeFont, setIsLargeFont] = useState<boolean>(false);
+      const [selectedConcertId, setSelectedConcertId] = useState<string>('c-daegu');
+      const [selectedStayType, setSelectedStayType] = useState<StayType>('1박 2일');
+      const [selectedDateIdx, setSelectedDateIdx] = useState<number>(0);
+      const [selectedOriginIdx, setSelectedOriginIdx] = useState<number>(0);
+      const [paxCount, setPaxCount] = useState<number>(2);
+      const [guestName, setGuestName] = useState<string>('김영숙');
+      const [guestPhone, setGuestPhone] = useState<string>('010-1234-5678');
+      const [privacyAgreed, setPrivacyAgreed] = useState<boolean>(true);
+      const [locationAgreed, setLocationAgreed] = useState<boolean>(false);
+
+      // 지역 관광 필터 상태
+      const [localCityFilter, setLocalCityFilter] = useState<string>('대구');
+      const [localCatFilter, setLocalCatFilter] = useState<SpotCategory | '전체'>('전체');
+      const [selectedSpotId, setSelectedSpotId] = useState<string>('sp-1');
+
+      // 모달 및 예약 DB 상태
+      const [reservations, setReservations] = useState<ReservationRecord[]>(() => {
+        const saved = localStorage.getItem('triptrot_v3_res');
+        return saved ? JSON.parse(saved) : [
+          {
+            id: 'DEMO-1024',
+            category: '공연 여행 (1박 2일)',
+            title: '대구 콘서트 & 로컬 체류형 투어',
+            guestName: '박순자',
+            maskedPhone: '010-****-8821',
+            date: '2026.11.14 (토) 17:00',
+            stayType: '1박 2일',
+            origin: '진주종합경기장 정문 앞',
+            pax: 2,
+            totalPrice: '298,000원',
+            status: '[시연용] 예약확정 · 숙박/셔틀 배정완료',
+            qrChecked: false,
+            isDemo: true
+          }
+        ];
       });
-    }
+      const [showResModal, setShowResModal] = useState<boolean>(false);
+      const [showChildModal, setShowChildModal] = useState<boolean>(false);
+      const [childStep, setChildStep] = useState<number>(2);
+      const [toastMsg, setToastMsg] = useState<string | null>(null);
 
-    function selectConcert(idx) {
-      selConcertIdx = idx;
-      selDateIdx = 0;
-      selOriginIdx = 0;
-      renderAllViews();
-    }
+      // 팬클럽 단체 관리 상태
+      const [clubMembers, setClubMembers] = useState([
+        { id: 1, name: '박순자 (진주)', paid: true, bus: '1호차', stay: '1박 2일', qr: true },
+        { id: 2, name: '김영숙 (마산)', paid: true, bus: '1호차', stay: '1박 2일', qr: true },
+        { id: 3, name: '이정자 (창원)', paid: true, bus: '1호차', stay: '당일형', qr: false },
+        { id: 4, name: '최미경 (진주)', paid: false, bus: '2호차', stay: '1박 2일', qr: false }
+      ]);
+      const [newClubMemberName, setNewClubMemberName] = useState('');
 
-    function renderSeniorStep2Dates() {
-      const c = concertsDB[selConcertIdx];
-      const box = document.getElementById('senior-date-grid');
-      box.innerHTML = '';
-      c.dates.forEach((d, idx) => {
-        const active = idx === selDateIdx;
-        box.insertAdjacentHTML('beforeend', `
-          <button onclick="selDateIdx=${idx}; renderSeniorStep2Dates(); updateSeniorSummary();" class="p-3.5 rounded-2xl text-left flex justify-between items-center u-btn ${active ? 'border-2 border-[#EA580C] bg-orange-50 font-black text-gray-900' : 'border border-gray-200 bg-white font-bold text-gray-600'}">
-            <span>📅 ${d} (${c.venue})</span>
-            <span class="text-xs font-black ${active ? 'text-[#EA580C]' : 'text-gray-400'}">${active ? '선택됨 ✔' : '선택'}</span>
-          </button>
-        `);
-      });
-    }
+      const currentConcert = useMemo(
+        () => INITIAL_CONCERTS.find(c => c.id === selectedConcertId) || INITIAL_CONCERTS[0],
+        [selectedConcertId]
+      );
 
-    function renderSeniorStep3Origins() {
-      const c = concertsDB[selConcertIdx];
-      const box = document.getElementById('senior-origin-grid');
-      box.innerHTML = '';
-      c.origins.forEach((o, idx) => {
-        const active = idx === selOriginIdx;
-        box.insertAdjacentHTML('beforeend', `
-          <button onclick="selOriginIdx=${idx}; renderSeniorStep3Origins(); updateSeniorSummary();" class="p-3.5 rounded-2xl text-left flex justify-between items-center u-btn ${active ? 'border-2 border-[#EA580C] bg-orange-50 font-black text-gray-900' : 'border border-gray-200 bg-white font-bold text-gray-600'}">
-            <span>🚌 ${o.name}</span>
-            <span class="text-xs font-black ${active ? 'text-[#EA580C]' : 'text-gray-400'}">${active ? '선택됨 ✔' : '선택'}</span>
-          </button>
-        `);
-      });
-    }
+      const currentPackage = useMemo(
+        () => currentConcert.packages.find(p => p.type === selectedStayType) || currentConcert.packages[0],
+        [currentConcert, selectedStayType]
+      );
 
-    function selectSeniorPax(n) {
-      selSeniorPax = n;
-      [1, 2, 3].forEach(i => {
-        document.getElementById('spax-' + i).className = (i === n)
-          ? 'py-3.5 rounded-2xl border-2 border-[#EA580C] bg-orange-50 font-black text-base text-gray-900 u-btn'
-          : 'py-3.5 rounded-2xl border-2 border-gray-200 bg-white font-bold text-base text-gray-600 u-btn';
-      });
-      updateSeniorSummary();
-    }
+      const filteredSpots = useMemo(() => {
+        return LOCAL_SPOTS.filter(
+          sp => sp.city === localCityFilter && (localCatFilter === '전체' || sp.category === localCatFilter)
+        );
+      }, [localCityFilter, localCatFilter]);
 
-    function updateSeniorSummary() {
-      const c = concertsDB[selConcertIdx];
-      const total = (c.price * selSeniorPax).toLocaleString();
-      document.getElementById('senior-summary-text').innerText = `${c.singer} ${c.city} (${c.dates[selDateIdx]}) · ${selSeniorPax}명`;
-      document.getElementById('senior-total-price').innerText = `${total}원`;
-    }
+      const activeSpot = useMemo(
+        () => LOCAL_SPOTS.find(s => s.id === selectedSpotId) || filteredSpots[0] || LOCAL_SPOTS[0],
+        [selectedSpotId, filteredSpots]
+      );
 
-    function submitSeniorBooking() {
-      const c = concertsDB[selConcertIdx];
-      const name = document.getElementById('senior-name').value || '어르신 고객';
-      const phone = document.getElementById('senior-phone').value || '010-0000-0000';
-      const origin = c.origins[selOriginIdx].name;
-      const total = (c.price * selSeniorPax).toLocaleString() + '원';
+      useEffect(() => {
+        document.body.classList.toggle('senior-large', isLargeFont);
+      }, [isLargeFont]);
 
-      const newRes = {
-        id: 'RES-' + Math.floor(1000 + Math.random() * 9000),
-        role: '어르신 간편예약',
-        guestName: name,
-        phone: phone,
-        concertTitle: c.title,
-        date: c.dates[selDateIdx],
-        origin: origin,
-        pax: selSeniorPax,
-        price: total,
-        status: '예약확정 (출발보장)',
-        qrChecked: false
+      useEffect(() => {
+        localStorage.setItem('triptrot_v3_res', JSON.stringify(reservations));
+      }, [reservations]);
+
+      const triggerToast = (msg: string) => {
+        setToastMsg(msg);
+        setTimeout(() => setToastMsg(null), 3500);
       };
 
-      reservationsDB.unshift(newRes);
-      saveDB();
-      speakText(`${name} 어르신, ${c.singer} 콘서트 동행 예약이 확정되었습니다!`);
-      openMyReservationModal();
-    }
-
-    // ================= 4. [메뉴 3] 당일 구체적 동선 타임라인 렌더링 =================
-    function renderScheduleTimeline() {
-      const c = concertsDB[selConcertIdx];
-      document.getElementById('sched-concert-title').innerText = `${c.title} 당일 상세 일정표`;
-      document.getElementById('sched-meetup-spot').innerText = c.meetupSpot;
-
-      const box = document.getElementById('sched-timeline-box');
-      box.innerHTML = '';
-      c.timeline.forEach(item => {
-        box.insertAdjacentHTML('beforeend', `
-          <div class="p-3.5 rounded-2xl bg-[#FAF8F5] border border-[#E6DFD3] flex gap-3 items-start">
-            <span class="bg-[#EA580C] text-white text-xs font-black px-2.5 py-1 rounded-lg shrink-0 mt-0.5">${item.time}</span>
-            <div>
-              <h4 class="font-black text-sm text-gray-900 u-sub">${item.title}</h4>
-              <p class="text-xs text-gray-600 font-bold mt-0.5">${item.desc}</p>
-            </div>
-          </div>
-        `);
-      });
-    }
-
-    // ================= 5. [메뉴 4] 자녀 대리 예약 & 실시간 탑승/도착 트래커 =================
-    function renderChildView() {
-      const sel = document.getElementById('child-concert-select');
-      sel.innerHTML = '';
-      concertsDB.forEach((c, idx) => {
-        sel.insertAdjacentHTML('beforeend', `<option value="${idx}" ${idx === selConcertIdx ? 'selected' : ''}>${c.title} (${c.dates[0]})</option>`);
-      });
-      renderChildLiveTracker();
-    }
-
-    function updateChildForm() {
-      selConcertIdx = parseInt(document.getElementById('child-concert-select').value, 10);
-      renderAllViews();
-    }
-
-    function selectChildPkg(pkg) {
-      selChildPkg = pkg;
-      document.getElementById('cpkg-basic').className = pkg === 'basic' ? 'p-3 rounded-xl border-2 border-sky-600 bg-sky-50 text-left' : 'p-3 rounded-xl border-2 border-gray-200 bg-white text-left opacity-70';
-      document.getElementById('cpkg-premium').className = pkg === 'premium' ? 'p-3 rounded-xl border-2 border-sky-600 bg-sky-50 text-left' : 'p-3 rounded-xl border-2 border-gray-200 bg-white text-left opacity-70';
-    }
-
-    function submitChildProxyBooking() {
-      const c = concertsDB[selConcertIdx];
-      const pName = document.getElementById('child-parent-name').value || '부모님';
-      const pPhone = document.getElementById('child-parent-phone').value || '';
-      const price = selChildPkg === 'basic' ? '59,000원' : '240,000원';
-      const pkgName = selChildPkg === 'basic' ? '기본 안심셔틀' : '전담 매니저 의전';
-
-      const newRes = {
-        id: 'GIFT-' + Math.floor(1000 + Math.random() * 9000),
-        role: `자녀 대리예약 (${pkgName})`,
-        guestName: pName,
-        phone: pPhone,
-        concertTitle: c.title,
-        date: c.dates[0],
-        origin: c.origins[0].name,
-        pax: 1,
-        price: price,
-        status: '결제완료 · 부모님 알림발송',
-        qrChecked: false
+      // 한국어 음성 안내 (TTS)
+      const speakGuide = (text: string) => {
+        if ('speechSynthesis' in window) {
+          window.speechSynthesis.cancel();
+          const u = new SpeechSynthesisUtterance(text);
+          u.lang = 'ko-KR';
+          u.rate = 0.94;
+          window.speechSynthesis.speak(u);
+          triggerToast('🔊 음성 안내가 재생됩니다.');
+        } else {
+          triggerToast(text);
+        }
       };
 
-      reservationsDB.unshift(newRes);
-      saveDB();
+      // 시연용 예약 생성 핸들러
+      const handleCreateReservation = (categoryLabel: string, customPrice?: number, customTitle?: string) => {
+        if (!privacyAgreed) {
+          triggerToast('⚠️ 개인정보 보호를 위해 수집·이용 동의 체크가 필요합니다.');
+          return;
+        }
+        const unitPrice = customPrice || currentPackage.price;
+        const total = (unitPrice * paxCount).toLocaleString() + '원';
+        const newRecord: ReservationRecord = {
+          id: 'SIM-' + Math.floor(1000 + Math.random() * 9000),
+          category: categoryLabel,
+          title: customTitle || `${currentConcert.singer} ${currentConcert.title}`,
+          guestName: guestName || '시연 고객',
+          maskedPhone: maskPhoneNumber(guestPhone),
+          date: currentConcert.dates[selectedDateIdx] || currentConcert.dates[0],
+          stayType: selectedStayType,
+          origin: currentConcert.shuttleOrigins[selectedOriginIdx]?.name || '현지 집결',
+          pax: paxCount,
+          totalPrice: total,
+          status: '[시연용] 가예약 접수완료 (실제 결제 미발생)',
+          qrChecked: false,
+          isDemo: true
+        };
+        setReservations([newRecord, ...reservations]);
+        setShowResModal(true);
+        triggerToast('✅ [시연용] 예약 내역이 생성되었습니다! (실제 결제는 이루어지지 않습니다)');
+      };
 
-      const kakaoMsg = `💝 [자녀가 보내드리는 콘서트 동행 예약권]\n• 참석자: ${pName}\n• 공연: ${c.title}\n• 일시: ${c.dates[0]}\n• 탑승장소: ${c.origins[0].name}\n• 귀가집결: ${c.meetupSpot}`;
-      shareKakaoText(kakaoMsg);
-    }
+      // 카카오톡 공유
+      const handleShareKakao = async (text: string) => {
+        const fullText = `${text}\n\n👉 TRIPTROT 플랫폼 확인: ${window.location.href}`;
+        if (navigator.clipboard) {
+          try { await navigator.clipboard.writeText(fullText); } catch (e) {}
+        }
+        if (navigator.share) {
+          try {
+            await navigator.share({ title: 'TRIPTROT 체류형 공연관광', text, url: window.location.href });
+            return;
+          } catch (e) {}
+        }
+        triggerToast('💬 공유 문구가 복사되었습니다. 카카오톡 채팅창에 붙여넣기(Ctrl+V) 해주세요.');
+      };
 
-    function renderChildLiveTracker() {
-      const c = concertsDB[selConcertIdx];
-      const steps = [
-        { time: '09:35', label: '1단계: 출발지 버스 안전 탑승 완료', desc: `${c.origins[0].name}에서 매니저 안내로 좌석 착석 완료` },
-        { time: '12:20', label: '2단계: 사전 예약 맛집 도착 및 식사 완료', desc: '대기 없이 전용 의자 좌석에서 점심 식사 완료' },
-        { time: '16:30', label: '3단계: 공연장 도착 및 화장실·좌석 안내 완료', desc: `${c.venue} 내부 좌석까지 안전 에스코트 완료` },
-        { time: '19:50', label: '4단계: 공연 종료 후 귀가 버스 탑승 출발', desc: `${c.meetupSpot}에서 탑승 후 귀가 중` }
+      const MENU_ITEMS: { key: MenuKey; label: string; icon: string }[] = [
+        { key: 'home', label: '홈', icon: 'home' },
+        { key: 'concert', label: '공연 여행', icon: 'bus' },
+        { key: 'local', label: '지역 관광', icon: 'compass' },
+        { key: 'map', label: '맛집·관광 지도', icon: 'map-pin' },
+        { key: 'premium', label: '프리미엄 투어', icon: 'crown' },
+        { key: 'guide', label: '청년 가이드', icon: 'user-check' },
+        { key: 'fanclub', label: '팬클럽 단체', icon: 'users' },
+        { key: 'gov', label: '지자체 협업', icon: 'bar-chart-3' }
       ];
 
-      const box = document.getElementById('child-live-tracker');
-      box.innerHTML = '';
-      steps.forEach((st, idx) => {
-        const done = idx < boardingStep;
-        box.insertAdjacentHTML('beforeend', `
-          <div class="flex items-start gap-3 p-2.5 rounded-xl ${done ? 'bg-white border border-sky-200' : 'opacity-45'}">
-            <span class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-black shrink-0 mt-0.5 ${done ? 'bg-emerald-600 text-white' : 'bg-gray-300 text-gray-600'}">
-              ${done ? '✔' : idx + 1}
-            </span>
-            <div class="text-xs">
-              <div class="font-black text-gray-900">${st.label} <span class="text-sky-700 ml-1">${done ? st.time : '(예정)'}</span></div>
-              <div class="text-gray-600 font-semibold mt-0.5">${st.desc}</div>
+      return (
+        <div className="min-h-screen flex flex-col bg-cream text-navy pb-24">
+          
+          {/* 최상단 시연용 안내 및 개인정보 보호 투명성 배너 */}
+          <div className="bg-navy-dark text-cream px-4 py-2 text-xs font-semibold flex flex-wrap justify-between items-center gap-2">
+            <div className="flex items-center gap-2">
+              <span className="bg-coral text-white font-black px-2 py-0.5 rounded text-[11px]">시연용 프로토타입</span>
+              <span>본 플랫폼의 예약·결제 및 지자체 통계 시뮬레이션은 시연용이며 실제 과금이 발생하지 않습니다.</span>
+            </div>
+            <div className="flex items-center gap-3 text-amber-200">
+              <span>🔒 전화번호 자동 마스킹 및 위치정보 동의제 적용</span>
             </div>
           </div>
-        `);
-      });
-    }
 
-    function simulateNextBoardingStep() {
-      boardingStep = (boardingStep % 4) + 1;
-      renderChildLiveTracker();
-      showToast(`🔔 부모님 이동 상태가 [${boardingStep}단계]로 업데이트되었습니다!`);
-    }
-
-    // ================= 6. [메뉴 5] 팬클럽 총무 단체 관리 대시보드 =================
-    function renderClubDashboard() {
-      const total = clubMembersDB.length;
-      const paid = clubMembersDB.filter(m => m.paid).length;
-      const qr = clubMembersDB.filter(m => m.qrChecked).length;
-
-      document.getElementById('club-stat-total').innerText = `${total}명`;
-      document.getElementById('club-stat-paid').innerText = `${paid}명`;
-      document.getElementById('club-stat-qr').innerText = `${qr}명`;
-
-      const list = document.getElementById('club-member-list');
-      list.innerHTML = '';
-      clubMembersDB.forEach((m, idx) => {
-        list.insertAdjacentHTML('beforeend', `
-          <div class="p-3 rounded-2xl bg-gray-50 border flex flex-wrap justify-between items-center gap-2 text-xs">
-            <div class="font-black text-sm text-gray-900">${idx + 1}. ${m.name}</div>
-            <div class="flex items-center gap-1.5">
-              <button onclick="toggleClubPaid(${idx})" class="px-2.5 py-1.5 rounded-lg font-black ${m.paid ? 'bg-emerald-600 text-white' : 'bg-rose-100 text-rose-700 border border-rose-300'}">
-                ${m.paid ? '입금완료' : '미입금'}
-              </button>
-              <button onclick="toggleClubBus(${idx})" class="px-2.5 py-1.5 rounded-lg bg-white border font-black text-gray-800">
-                🚌 ${m.bus}
-              </button>
-              <button onclick="toggleClubQR(${idx})" class="px-2.5 py-1.5 rounded-lg font-black ${m.qrChecked ? 'bg-purple-800 text-white' : 'bg-gray-200 text-gray-700'}">
-                <i class="fa-solid fa-qrcode mr-0.5"></i>${m.qrChecked ? '탑승완료' : 'QR체크'}
-              </button>
-            </div>
-          </div>
-        `);
-      });
-    }
-
-    function addClubMember() {
-      const nameInput = document.getElementById('new-member-name');
-      const busSelect = document.getElementById('new-member-bus');
-      const name = nameInput.value.trim();
-      if (!name) {
-        showToast('회원 성함이나 닉네임을 입력해 주세요.');
-        return;
-      }
-      clubMembersDB.push({ id: Date.now(), name: name, paid: false, bus: busSelect.value, qrChecked: false });
-      nameInput.value = '';
-      saveDB();
-      renderClubDashboard();
-      showToast(`✅ [${name}] 회원이 명단에 추가되었습니다.`);
-    }
-
-    function toggleClubPaid(idx) {
-      clubMembersDB[idx].paid = !clubMembersDB[idx].paid;
-      saveDB();
-      renderClubDashboard();
-    }
-
-    function toggleClubBus(idx) {
-      clubMembersDB[idx].bus = clubMembersDB[idx].bus === '1호차' ? '2호차' : '1호차';
-      saveDB();
-      renderClubDashboard();
-    }
-
-    function toggleClubQR(idx) {
-      clubMembersDB[idx].qrChecked = !clubMembersDB[idx].qrChecked;
-      saveDB();
-      renderClubDashboard();
-      if (clubMembersDB[idx].qrChecked) {
-        showToast(`🎟️ [${clubMembersDB[idx].name}] 님 QR 탑승 체크인이 완료되었습니다!`);
-      }
-    }
-
-    function sendClubInviteLink() {
-      const c = concertsDB[selConcertIdx];
-      shareKakaoText(`📢 [팬클럽 원정버스 단체 신청 링크]\n• 공연: ${c.title}\n• 일시: ${c.dates[0]}\n• 아래 링크에서 참석 신청 및 호차 배정을 확인하세요!`);
-    }
-
-    function sendClubNoticeKakao() {
-      const msg = document.getElementById('club-notice-text').value;
-      shareKakaoText(msg);
-    }
-
-    // ================= 7. 카카오톡 공유 & 내 예약 확인 모달 & 관리자 페이지 =================
-    async function shareKakaoText(text) {
-      const url = window.location.href;
-      const full = `${text}\n\n👉 바로 열기: ${url}`;
-      if (navigator.clipboard) {
-        try { await navigator.clipboard.writeText(full); } catch (e) {}
-      }
-      if (navigator.share) {
-        try {
-          await navigator.share({ title: 'TRIPTROT 안내', text: text, url: url });
-          return;
-        } catch (e) {}
-      }
-      if (/Android|iPhone|iPad/i.test(navigator.userAgent)) {
-        window.location.href = `kakaotalk://msg/text/${encodeURIComponent(full)}`;
-      } else {
-        showToast('💬 카카오톡 공유 문구가 복사되었습니다! 카톡 창에 붙여넣기(Ctrl+V) 하세요.');
-      }
-    }
-
-    function shareScheduleToKakao() {
-      const c = concertsDB[selConcertIdx];
-      shareKakaoText(`🗓️ [${c.title} 당일 일정 및 집결 안내]\n• 출발: ${c.origins[0].name}\n• 공연장: ${c.venue}\n• 귀가 집결지: ${c.meetupSpot}\n• 담당 매니저: 010-1234-5678`);
-    }
-
-    function shareFamilyStatusKakao() {
-      const c = concertsDB[selConcertIdx];
-      shareKakaoText(`🔔 [TRIPTROT 부모님 실시간 안심 알림]\n• 공연: ${c.title}\n• 현재 상태: 식사 완료 후 공연장 안전 착석 확인되었습니다!`);
-    }
-
-    function updateHeaderBadge() {
-      document.getElementById('header-res-count').innerText = reservationsDB.length;
-    }
-
-    function openMyReservationModal() {
-      const box = document.getElementById('my-res-list');
-      box.innerHTML = '';
-      if (reservationsDB.length === 0) {
-        box.innerHTML = `<div class="text-center py-8 text-gray-400 font-bold text-sm">아직 예약 내역이 없습니다.<br>[2.간편예약] 또는 [4.자녀안심] 메뉴에서 예약해 보세요!</div>`;
-      } else {
-        reservationsDB.forEach((r, idx) => {
-          box.insertAdjacentHTML('beforeend', `
-            <div class="p-4 rounded-2xl bg-[#FAF8F5] border-2 border-[#E6DFD3] space-y-2">
-              <div class="flex justify-between items-center">
-                <span class="bg-[#EA580C] text-white text-xs font-black px-2.5 py-0.5 rounded-full">${r.role}</span>
-                <span class="text-xs font-black text-emerald-700">${r.status}</span>
+          {/* 상단 고정 헤더 & 8대 핵심 메뉴 내비게이션 */}
+          <header className="sticky top-0 z-30 bg-white/95 backdrop-blur border-b-2 border-cream-border shadow-xs">
+            <div className="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+              <div onClick={() => setActiveMenu('home')} className="cursor-pointer flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-2xl bg-navy text-white flex items-center justify-center shadow-sm">
+                  <Icon name="Compass" className="w-6 h-6 text-coral" />
+                </div>
+                <div>
+                  <span className="font-black text-2xl tracking-tight text-navy block leading-none">TRIPTROT</span>
+                  <span className="text-xs font-bold text-gray-500 block mt-0.5">트롯 팬덤 기반 체류형 지역관광 플랫폼</span>
+                </div>
               </div>
-              <h4 class="font-black text-base text-gray-900">${r.concertTitle}</h4>
-              <div class="text-xs font-bold text-gray-600 space-y-0.5">
-                <p>• 예약자: ${r.guestName} (${r.pax}명) / ${r.phone}</p>
-                <p>• 일시: ${r.date}</p>
-                <p>• 탑승: ${r.origin}</p>
-              </div>
-              <div class="pt-2 border-t flex justify-between items-center">
-                <span class="font-black text-base text-[#EA580C]">${r.price}</span>
-                <button onclick="toggleMyResQR(${idx})" class="px-3 py-1.5 rounded-xl font-black text-xs ${r.qrChecked ? 'bg-emerald-700 text-white' : 'bg-gray-900 text-amber-300'}">
-                  <i class="fa-solid fa-qrcode mr-1"></i>${r.qrChecked ? 'QR 탑승완료 ✔' : 'QR 탑승체크인'}
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setShowChildModal(true)}
+                  className="hidden sm:flex items-center gap-1.5 bg-cream-dark hover:bg-cream-border text-navy font-extrabold px-3.5 py-2 rounded-xl text-xs border border-cream-border transition"
+                >
+                  <Icon name="HeartHandshake" className="w-4 h-4 text-coral" />
+                  <span>자녀 대리예약·안심알림</span>
+                </button>
+                <button
+                  onClick={() => setShowResModal(true)}
+                  className="bg-coral text-white font-black px-3.5 py-2 rounded-xl text-xs flex items-center gap-1.5 shadow-xs"
+                >
+                  <Icon name="Ticket" className="w-4 h-4" />
+                  <span>예약확인</span>
+                  <span className="bg-white text-coral text-[11px] font-black w-5 h-5 rounded-full flex items-center justify-center">
+                    {reservations.length}
+                  </span>
+                </button>
+                <button
+                  onClick={() => setIsLargeFont(!isLargeFont)}
+                  className={`font-black px-3 py-2 rounded-xl text-xs border-2 transition ${
+                    isLargeFont ? 'bg-navy text-white border-navy' : 'bg-white text-navy border-navy'
+                  }`}
+                >
+                  {isLargeFont ? '기본 글씨' : '어르신 큰글씨+'}
                 </button>
               </div>
             </div>
-          `);
-        });
-      }
-      document.getElementById('myResModal').classList.remove('hidden');
-    }
 
-    function toggleMyResQR(idx) {
-      reservationsDB[idx].qrChecked = !reservationsDB[idx].qrChecked;
-      saveDB();
-      openMyReservationModal();
-      showToast('🎟️ 모바일 QR 탑승 체크인이 완료되었습니다!');
-    }
-
-    function closeMyReservationModal() {
-      document.getElementById('myResModal').classList.add('hidden');
-    }
-
-    // 관리자 모달 제어
-    function openAdminModal() {
-      const box = document.getElementById('admin-res-list');
-      box.innerHTML = '';
-      if (reservationsDB.length === 0) {
-        box.innerHTML = `<p class="text-gray-400 py-3 text-center">접수된 예약 데이터가 없습니다.</p>`;
-      } else {
-        reservationsDB.forEach((r, idx) => {
-          box.insertAdjacentHTML('beforeend', `
-            <div class="p-2.5 rounded-xl bg-gray-50 border flex justify-between items-center">
-              <div>
-                <div class="font-black text-gray-900">${r.guestName} (${r.concertTitle})</div>
-                <div class="text-[11px] text-gray-500">${r.date} · ${r.price}</div>
+            {/* 8대 핵심 메뉴 탭 바 */}
+            <nav className="max-w-6xl mx-auto px-4 py-2 overflow-x-auto no-scrollbar border-t border-cream-border bg-cream/60">
+              <div className="flex gap-1.5 min-w-max">
+                {MENU_ITEMS.map(item => {
+                  const active = activeMenu === item.key;
+                  return (
+                    <button
+                      key={item.key}
+                      onClick={() => {
+                        setActiveMenu(item.key);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className={`px-4 py-2.5 rounded-xl font-extrabold text-sm flex items-center gap-1.5 transition s-btn ${
+                        active
+                          ? 'bg-navy text-white shadow-sm'
+                          : 'bg-white text-navy hover:bg-cream-dark border border-cream-border'
+                      }`}
+                    >
+                      <Icon name={item.icon} className={`w-4 h-4 ${active ? 'text-coral' : 'text-gray-500'}`} />
+                      <span>{item.label}</span>
+                    </button>
+                  );
+                })}
               </div>
-              <button onclick="deleteRes(${idx})" class="text-rose-600 font-black px-2 py-1 border rounded bg-white">삭제</button>
+            </nav>
+          </header>
+
+          {/* ================= 메인 컨텐츠 영역 (단계별 8개 메뉴) ================= */}
+          <main className="max-w-6xl w-full mx-auto px-4 py-6 flex-1 space-y-8">
+
+            {/* =========================================================================
+                [메뉴 1: 홈 (메인 화면)]
+               ========================================================================= */}
+            {activeMenu === 'home' && (
+              <div className="space-y-8">
+                {/* 메인 히어로 배너 */}
+                <section className="rounded-3xl bg-navy text-white p-6 md:p-10 shadow-xl relative overflow-hidden">
+                  <div className="max-w-2xl space-y-4 relative z-10">
+                    <div className="inline-flex items-center gap-2 bg-coral px-3.5 py-1 rounded-full text-xs font-black">
+                      <span>체류형 로컬 관광 · 지역 청년 일자리 상생 플랫폼</span>
+                    </div>
+                    <h1 className="text-2xl md:text-4xl font-black leading-tight s-title">
+                      좋아하는 가수를 만나러 가는 길,<br />
+                      <span className="text-amber-300">지역 맛집·전통시장·숙박</span>까지 한 번에.
+                    </h1>
+                    <p className="text-gray-200 text-base md:text-lg font-medium leading-relaxed s-body">
+                      당일치기 콘서트 관람을 넘어 1박 2일·2박 3일 지역 명소 여행으로 연결하고, 교육받은 지역 청년 가이드가 어르신의 이동부터 귀가까지 안전하게 동행합니다.
+                    </p>
+                    <div className="pt-2 flex flex-wrap gap-3">
+                      <button
+                        onClick={() => setActiveMenu('concert')}
+                        className="px-6 py-4 rounded-2xl bg-coral hover:bg-coral-dark text-white font-black text-base shadow-lg flex items-center gap-2 s-btn"
+                      >
+                        <span>공연 여행 & 숙박 패키지 보기</span>
+                        <Icon name="ArrowRight" className="w-5 h-5" />
+                      </button>
+                      <button
+                        onClick={() => speakGuide('반갑습니다! 트립트롯은 콘서트 셔틀부터 지역 맛집, 전통시장, 숙박, 그리고 청년 가이드 동행까지 한 번에 예약할 수 있는 체류형 관광 플랫폼입니다.')}
+                        className="px-5 py-4 rounded-2xl bg-white/15 hover:bg-white/25 border border-white/30 text-white font-extrabold text-base flex items-center gap-2 s-btn"
+                      >
+                        <Icon name="Volume2" className="w-5 h-5 text-amber-300" />
+                        <span>음성으로 안내 듣기</span>
+                      </button>
+                    </div>
+                  </div>
+                </section>
+
+                {/* 사업 목적 & 이용자별 빠른 진입 그리드 */}
+                <section className="space-y-4">
+                  <div className="flex justify-between items-end">
+                    <div>
+                      <span className="text-xs font-black text-coral uppercase">Target-Specific Service</span>
+                      <h2 className="text-xl md:text-2xl font-black text-navy s-title">누구를 위한 서비스인가요? (맞춤 메뉴 바로가기)</h2>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div onClick={() => setActiveMenu('concert')} className="cursor-pointer bg-white p-6 rounded-3xl border-2 border-cream-border hover:border-coral transition shadow-sm space-y-3">
+                      <div className="w-12 h-12 rounded-2xl bg-coral-light text-coral flex items-center justify-center">
+                        <Icon name="Bus" className="w-6 h-6" />
+                      </div>
+                      <span className="inline-block bg-cream-dark text-navy text-xs font-black px-2.5 py-0.5 rounded-full">어르신 · 일반 관람객</span>
+                      <h3 className="text-lg font-black text-navy s-title">① 공연 여행 & 간편 예약</h3>
+                      <p className="text-sm text-gray-600 font-medium s-body">가수별 일정 확인부터 셔틀, 당일·1박 2일·2박 3일 체류형 코스를 큰 글씨로 쉽게 예약합니다.</p>
+                      <span className="text-xs font-black text-coral block pt-1">메뉴 이동 ➔</span>
+                    </div>
+
+                    <div onClick={() => setActiveMenu('local')} className="cursor-pointer bg-white p-6 rounded-3xl border-2 border-cream-border hover:border-coral transition shadow-sm space-y-3">
+                      <div className="w-12 h-12 rounded-2xl bg-navy/10 text-navy flex items-center justify-center">
+                        <Icon name="MapPin" className="w-6 h-6" />
+                      </div>
+                      <span className="inline-block bg-cream-dark text-navy text-xs font-black px-2.5 py-0.5 rounded-full">지역 상권 연결</span>
+                      <h3 className="text-lg font-black text-navy s-title">② 지역 관광 & 맛집 지도</h3>
+                      <p className="text-sm text-gray-600 font-medium s-body">방송 소개 맛집(출처 명시), 전통시장, 관광지, 제휴 숙박 정보를 카카오맵으로 확인합니다.</p>
+                      <span className="text-xs font-black text-navy block pt-1">메뉴 이동 ➔</span>
+                    </div>
+
+                    <div onClick={() => setActiveMenu('guide')} className="cursor-pointer bg-white p-6 rounded-3xl border-2 border-cream-border hover:border-coral transition shadow-sm space-y-3">
+                      <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center">
+                        <Icon name="UserCheck" className="w-6 h-6" />
+                      </div>
+                      <span className="inline-block bg-emerald-50 text-emerald-800 text-xs font-black px-2.5 py-0.5 rounded-full">청년 일자리 · 자녀 안심</span>
+                      <h3 className="text-lg font-black text-navy s-title">③ 청년 가이드 & 프리미엄</h3>
+                      <p className="text-sm text-gray-600 font-medium s-body">검증된 교육을 이수한 지역 청년 가이드가 동행하며, 자녀에게 실시간 탑승·도착 알림을 보냅니다.</p>
+                      <span className="text-xs font-black text-emerald-700 block pt-1">메뉴 이동 ➔</span>
+                    </div>
+
+                    <div onClick={() => setActiveMenu('gov')} className="cursor-pointer bg-white p-6 rounded-3xl border-2 border-cream-border hover:border-coral transition shadow-sm space-y-3">
+                      <div className="w-12 h-12 rounded-2xl bg-amber-100 text-amber-800 flex items-center justify-center">
+                        <Icon name="BarChart3" className="w-6 h-6" />
+                      </div>
+                      <span className="inline-block bg-amber-50 text-amber-900 text-xs font-black px-2.5 py-0.5 rounded-full">팬클럽 총무 · 지자체</span>
+                      <h3 className="text-lg font-black text-navy s-title">④ 단체 관리 & 지자체 협업</h3>
+                      <p className="text-sm text-gray-600 font-medium s-body">팬클럽 총무용 출석·입금 대시보드와 지자체용 지역 소비액·숙박 전환 지표를 제공합니다.</p>
+                      <span className="text-xs font-black text-amber-800 block pt-1">메뉴 이동 ➔</span>
+                    </div>
+                  </div>
+                </section>
+
+                {/* 자녀 안심 대리예약 바로가기 배너 (기존 핵심 기능 보존) */}
+                <section className="bg-white rounded-3xl p-6 border-2 border-navy flex flex-col md:flex-row justify-between items-center gap-4 shadow-sm">
+                  <div className="space-y-1">
+                    <span className="bg-navy text-white text-xs font-black px-3 py-1 rounded-full">자녀를 위한 부모님 안심 기능</span>
+                    <h3 className="text-xl font-black text-navy mt-1 s-title">부모님 대신 예약해 드리고, 실시간 탑승·도착 알림을 받아보세요</h3>
+                    <p className="text-sm text-gray-600 font-medium s-body">자녀분이 예약 후 카카오톡으로 일정을 공유하면, 당일 버스 탑승부터 식사·공연장 착석까지 단계별로 확인하실 수 있습니다.</p>
+                  </div>
+                  <button
+                    onClick={() => setShowChildModal(true)}
+                    className="w-full md:w-auto shrink-0 px-6 py-4 rounded-2xl bg-navy text-white font-black text-sm hover:bg-navy-light transition s-btn"
+                  >
+                    부모님 대신 예약 & 실시간 알림창 열기 ➔
+                  </button>
+                </section>
+              </div>
+            )}
+
+            {/* =========================================================================
+                [메뉴 2: 공연 여행 (당일형 · 1박 2일 · 2박 3일 체류형 상품 및 셔틀 예약)]
+               ========================================================================= */}
+            {activeMenu === 'concert' && (
+              <div className="space-y-6">
+                <div className="bg-navy text-white p-6 rounded-3xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                  <div>
+                    <span className="bg-coral text-white text-xs font-black px-3 py-1 rounded-full">공연 + 지역 체류 결합 상품</span>
+                    <h2 className="text-2xl font-black mt-2 s-title">1. 가수별 공연 일정 및 체류형 패키지 예약</h2>
+                    <p className="text-sm text-gray-200 mt-1 s-body">가수 → 공연 날짜 → 체류 기간(당일/1박2일/2박3일) → 출발지 순서로 간편하게 선택하세요.</p>
+                  </div>
+                  <button
+                    onClick={() => speakGuide(`${currentConcert.singer} ${currentConcert.city} 공연 여행 예약 화면입니다. 당일형부터 1박 2일, 2박 3일 숙박 상품까지 선택하실 수 있습니다.`)}
+                    className="px-4 py-2.5 rounded-xl bg-white text-navy font-black text-xs flex items-center gap-1.5 shrink-0"
+                  >
+                    <Icon name="Volume2" className="w-4 h-4 text-coral" />
+                    <span>음성 안내</span>
+                  </button>
+                </div>
+
+                {/* STEP 1: 가수 및 공연 지역 선택 */}
+                <div className="bg-white p-6 rounded-3xl border-2 border-cream-border space-y-4">
+                  <h3 className="text-lg font-black text-navy s-title">STEP 1. 관람하실 가수 및 공연장 선택</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    {INITIAL_CONCERTS.map(c => {
+                      const active = c.id === selectedConcertId;
+                      return (
+                        <button
+                          key={c.id}
+                          onClick={() => {
+                            setSelectedConcertId(c.id);
+                            setLocalCityFilter(c.city);
+                            setSelectedDateIdx(0);
+                            setSelectedOriginIdx(0);
+                          }}
+                          className={`p-4 rounded-2xl text-left border-2 transition s-btn ${
+                            active ? 'border-coral bg-coral-light shadow-xs' : 'border-cream-border bg-cream/40 hover:bg-cream'
+                          }`}
+                        >
+                          <span className="text-xs font-black text-coral block">{c.city} 공연</span>
+                          <span className="text-xl font-black text-navy block mt-0.5">{c.singer}</span>
+                          <span className="text-xs text-gray-600 font-bold block mt-1 truncate">{c.venue}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* STEP 2: 당일형 / 1박 2일 / 2박 3일 체류 기간 선택 */}
+                <div className="bg-white p-6 rounded-3xl border-2 border-cream-border space-y-4">
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-lg font-black text-navy s-title">STEP 2. 체류 기간(상품 유형) 선택</h3>
+                    <span className="text-xs font-black text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full">숙박 선택 시 전통시장 상품권 증정</span>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {currentConcert.packages.map(pkg => {
+                      const active = pkg.type === selectedStayType;
+                      return (
+                        <div
+                          key={pkg.type}
+                          onClick={() => setSelectedStayType(pkg.type)}
+                          className={`cursor-pointer p-5 rounded-2xl border-2 transition flex flex-col justify-between ${
+                            active ? 'border-navy bg-navy text-white shadow-md' : 'border-cream-border bg-cream/30 text-navy hover:border-navy/50'
+                          }`}
+                        >
+                          <div className="space-y-2">
+                            <div className="flex justify-between items-center">
+                              <span className={`text-xs font-black px-3 py-1 rounded-full ${active ? 'bg-coral text-white' : 'bg-navy text-white'}`}>
+                                {pkg.type}
+                              </span>
+                              <span className={`text-xl font-black ${active ? 'text-amber-300' : 'text-coral'}`}>
+                                {pkg.price.toLocaleString()}원
+                              </span>
+                            </div>
+                            <p className={`text-sm font-bold pt-1 s-body ${active ? 'text-gray-100' : 'text-gray-700'}`}>
+                              {pkg.summary}
+                            </p>
+                          </div>
+                          <ul className={`mt-4 pt-3 border-t text-xs space-y-1 font-semibold ${active ? 'border-white/20 text-gray-200' : 'border-cream-border text-gray-600'}`}>
+                            {pkg.includes.map((inc, i) => (
+                              <li key={i}>✔ {inc}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* 선택된 상품의 일차별 상세 동선 */}
+                  <div className="bg-cream p-5 rounded-2xl border border-cream-border space-y-2">
+                    <h4 className="font-black text-sm text-navy">📅 [{selectedStayType}] 상세 여행 일정표</h4>
+                    <div className="space-y-1.5 text-sm font-bold text-gray-700 s-body">
+                      {currentPackage.schedule.map((line, idx) => (
+                        <div key={idx} className="p-2.5 bg-white rounded-xl border border-cream-border">
+                          {line}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* STEP 3 & 4: 날짜·셔틀 출발지·인원 선택 및 시연 예약 확정 */}
+                <div className="bg-white p-6 rounded-3xl border-2 border-navy space-y-5">
+                  <h3 className="text-lg font-black text-navy s-title">STEP 3. 공연 일시 · 셔틀 탑승지 · 인원 선택</h3>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-black text-navy block">1) 공연 관람 일시</label>
+                      {currentConcert.dates.map((d, idx) => (
+                        <button
+                          key={d}
+                          onClick={() => setSelectedDateIdx(idx)}
+                          className={`w-full p-3.5 rounded-xl border-2 text-left font-black text-sm flex justify-between items-center s-btn ${
+                            selectedDateIdx === idx ? 'border-coral bg-coral-light text-navy' : 'border-cream-border bg-white text-gray-600'
+                          }`}
+                        >
+                          <span>📅 {d}</span>
+                          <span>{selectedDateIdx === idx ? '선택됨 ✔' : '선택'}</span>
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-black text-navy block">2) 셔틀버스 출발지 및 탑승 시간</label>
+                      {currentConcert.shuttleOrigins.map((orig, idx) => (
+                        <button
+                          key={orig.name}
+                          onClick={() => setSelectedOriginIdx(idx)}
+                          className={`w-full p-3.5 rounded-xl border-2 text-left font-black text-sm flex justify-between items-center s-btn ${
+                            selectedOriginIdx === idx ? 'border-coral bg-coral-light text-navy' : 'border-cream-border bg-white text-gray-600'
+                          }`}
+                        >
+                          <span>🚌 {orig.name} ({orig.time})</span>
+                          <span>{selectedOriginIdx === idx ? '선택됨 ✔' : '선택'}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2 border-t border-cream-border">
+                    <div>
+                      <label className="text-xs font-black text-gray-600 block mb-1">예약 인원수</label>
+                      <div className="flex items-center justify-between bg-cream p-2.5 rounded-xl border border-cream-border">
+                        <button onClick={() => setPaxCount(Math.max(1, paxCount - 1))} className="w-9 h-9 rounded-lg bg-white border font-black text-lg">-</button>
+                        <span className="font-black text-lg text-navy">{paxCount}명</span>
+                        <button onClick={() => setPaxCount(Math.min(10, paxCount + 1))} className="w-9 h-9 rounded-lg bg-navy text-white font-black text-lg">+</button>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-xs font-black text-gray-600 block mb-1">예약자 성함</label>
+                      <input value={guestName} onChange={e => setGuestName(e.target.value)} className="w-full p-3.5 rounded-xl bg-cream border border-cream-border font-black text-sm" />
+                    </div>
+                    <div>
+                      <label className="text-xs font-black text-gray-600 block mb-1">연락처 (자동 마스킹 보호)</label>
+                      <input value={guestPhone} onChange={e => setGuestPhone(e.target.value)} className="w-full p-3.5 rounded-xl bg-cream border border-cream-border font-black text-sm" />
+                    </div>
+                  </div>
+
+                  {/* 개인정보 수집 동의 체크박스 */}
+                  <label className="flex items-center gap-2 text-xs font-bold text-gray-600 cursor-pointer">
+                    <input type="checkbox" checked={privacyAgreed} onChange={e => setPrivacyAgreed(e.target.checked)} className="w-4 h-4 accent-coral" />
+                    <span>[개인정보 보호] 시연용 예약 확인을 위한 성함·연락처(마스킹 처리) 임시 저장에 동의합니다.</span>
+                  </label>
+
+                  {/* 하단 결제 요약 바 */}
+                  <div className="bg-navy text-white p-5 rounded-2xl flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div>
+                      <span className="text-xs text-amber-300 font-bold block">
+                        [{selectedStayType}] {currentConcert.singer} {currentConcert.city} 투어 · {paxCount}명 (티켓 별도)
+                      </span>
+                      <span className="text-2xl font-black text-white">
+                        총 {(currentPackage.price * paxCount).toLocaleString()}원 <span className="text-xs font-normal text-gray-300">(시연용 가예약)</span>
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => handleCreateReservation(`공연 여행 (${selectedStayType})`)}
+                      className="w-full md:w-auto px-8 py-4 rounded-xl bg-coral hover:bg-coral-dark text-white font-black text-base shadow-lg s-btn"
+                    >
+                      시연용 투어 예약하기 ➔
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* =========================================================================
+                [메뉴 3: 지역 관광 (맛집·관광지·전통시장·숙박 정보 및 추천 출처 구분)]
+               ========================================================================= */}
+            {activeMenu === 'local' && (
+              <div className="space-y-6">
+                <div className="bg-white p-6 rounded-3xl border-2 border-cream-border space-y-4">
+                  <div className="flex flex-col md:flex-row justify-between md:items-center gap-3">
+                    <div>
+                      <span className="bg-navy text-white text-xs font-black px-3 py-1 rounded-full">허위 추천 금지 · 출처 투명 공개</span>
+                      <h2 className="text-2xl font-black text-navy mt-2 s-title">2. 공연 지역 맛집 · 관광지 · 전통시장 · 숙박 정보</h2>
+                      <p className="text-sm text-gray-600 mt-0.5 s-body">
+                        사진 남용 없이 검증된 정보만 제공하며, <strong>[방송소개(출처확인)] · [팬추천] · [지역공식추천]</strong>을 명확히 구분합니다.
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => setActiveMenu('map')}
+                      className="px-5 py-3 rounded-xl bg-coral text-white font-black text-xs flex items-center gap-1.5 shrink-0"
+                    >
+                      <Icon name="Map" className="w-4 h-4" />
+                      <span>카카오맵 동선 지도로 보기 ➔</span>
+                    </button>
+                  </div>
+
+                  {/* 도시 선택 & 카테고리 필터 */}
+                  <div className="flex flex-wrap gap-2 pt-2 border-t border-cream-border">
+                    {['대구', '부산', '전주', '안동'].map(city => (
+                      <button
+                        key={city}
+                        onClick={() => setLocalCityFilter(city)}
+                        className={`px-4 py-2 rounded-xl font-black text-sm ${
+                          localCityFilter === city ? 'bg-navy text-white' : 'bg-cream text-navy border border-cream-border'
+                        }`}
+                      >
+                        📍 {city}
+                      </button>
+                    ))}
+                    <div className="h-6 w-px bg-cream-border mx-1 self-center"></div>
+                    {(['전체', '맛집', '관광지', '전통시장', '숙박'] as const).map(cat => (
+                      <button
+                        key={cat}
+                        onClick={() => setLocalCatFilter(cat)}
+                        className={`px-3.5 py-2 rounded-xl font-bold text-xs ${
+                          localCatFilter === cat ? 'bg-coral text-white font-black' : 'bg-white text-gray-600 border border-cream-border'
+                        }`}
+                      >
+                        {cat}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 지역 관광 카드 리스트 (무관한 사진 배제, 아이콘·다이어그램·명확한 메타데이터 활용) */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {filteredSpots.map(spot => {
+                    const badgeStyle =
+                      spot.recType === '방송소개(출처확인)'
+                        ? 'bg-coral text-white'
+                        : spot.recType === '팬추천'
+                        ? 'bg-amber-500 text-navy'
+                        : 'bg-navy text-white';
+
+                    const catIcon =
+                      spot.category === '맛집' ? 'Utensils' :
+                      spot.category === '전통시장' ? 'ShoppingBag' :
+                      spot.category === '숙박' ? 'BedDouble' : 'Landmark';
+
+                    return (
+                      <div key={spot.id} className="bg-white p-6 rounded-3xl border-2 border-cream-border hover:border-navy transition flex flex-col justify-between space-y-4 shadow-xs">
+                        <div className="space-y-3">
+                          <div className="flex justify-between items-start gap-2">
+                            <div className="flex items-center gap-2">
+                              <div className="w-10 h-10 rounded-xl bg-cream flex items-center justify-center text-navy font-black">
+                                <Icon name={catIcon} className="w-5 h-5 text-coral" />
+                              </div>
+                              <div>
+                                <span className="text-xs font-black text-gray-500">{spot.city} · {spot.category}</span>
+                                <h3 className="text-xl font-black text-navy s-title">{spot.name}</h3>
+                              </div>
+                            </div>
+                            <span className={`text-xs font-black px-3 py-1 rounded-full shrink-0 ${badgeStyle}`}>
+                              {spot.recType}
+                            </span>
+                          </div>
+
+                          {/* 추천 근거(출처) 명시 박스 */}
+                          <div className="bg-cream p-3 rounded-xl border border-cream-border text-xs font-bold text-navy">
+                            📌 <strong>선정 근거:</strong> {spot.recSource}
+                          </div>
+
+                          {/* 상세 정보 (대표메뉴/특징, 가격, 영업시간, 주소) */}
+                          <div className="space-y-1.5 text-sm font-semibold text-gray-700 s-body">
+                            <p>• <strong className="text-navy">대표 메뉴/특징:</strong> <span className="text-coral font-black">{spot.signature}</span></p>
+                            <p>• <strong className="text-navy">가격대:</strong> {spot.priceText}</p>
+                            <p>• <strong className="text-navy">영업/이용시간:</strong> {spot.hours}</p>
+                            <p>• <strong className="text-navy">상세 주소:</strong> {spot.address}</p>
+                          </div>
+
+                          <div className="flex flex-wrap gap-1.5 pt-1">
+                            {spot.seniorFriendly.map((bf, i) => (
+                              <span key={i} className="bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold px-2.5 py-1 rounded-lg">
+                                ✔ {bf}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="pt-3 border-t border-cream-border flex gap-2">
+                          <a
+                            href={`https://map.kakao.com/link/search/${encodeURIComponent(spot.kakaoQuery)}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="flex-1 py-3 rounded-xl bg-[#FEE500] text-[#191919] font-black text-xs flex items-center justify-center gap-1.5 s-btn"
+                          >
+                            <Icon name="Navigation" className="w-4 h-4" />
+                            <span>카카오맵 상세·길찾기</span>
+                          </a>
+                          <button
+                            onClick={() => {
+                              setSelectedSpotId(spot.id);
+                              setActiveMenu('map');
+                            }}
+                            className="px-4 py-3 rounded-xl bg-navy text-white font-black text-xs s-btn"
+                          >
+                            지도에서 위치 보기
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* =========================================================================
+                [메뉴 4: 맛집 및 관광 지도 (인터랙티브 동선 다이어그램 & Kakao Maps 연동)]
+               ========================================================================= */}
+            {activeMenu === 'map' && (
+              <div className="space-y-6">
+                <div className="bg-white p-6 rounded-3xl border-2 border-cream-border space-y-4">
+                  <div className="flex flex-col md:flex-row justify-between md:items-center gap-3">
+                    <div>
+                      <span className="bg-coral text-white text-xs font-black px-3 py-1 rounded-full">Kakao Maps 연동 & 공연장 생존 지도</span>
+                      <h2 className="text-2xl font-black text-navy mt-2 s-title">3. 공연장 중심 체류형 관광 동선 지도</h2>
+                      <p className="text-sm text-gray-600 s-body">공연장을 중심으로 맛집·전통시장·숙박·안 붐비는 화장실·셔틀 집결지를 한눈에 확인하세요.</p>
+                    </div>
+                    <div className="flex gap-2">
+                      {['대구', '부산', '전주', '안동'].map(city => (
+                        <button
+                          key={city}
+                          onClick={() => {
+                            setLocalCityFilter(city);
+                            const first = LOCAL_SPOTS.find(s => s.city === city);
+                            if (first) setSelectedSpotId(first.id);
+                          }}
+                          className={`px-3.5 py-2 rounded-xl font-black text-xs ${
+                            localCityFilter === city ? 'bg-navy text-white' : 'bg-cream text-navy border border-cream-border'
+                          }`}
+                        >
+                          {city}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 위치정보 보호 동의 스위치 */}
+                  <div className="bg-cream p-3.5 rounded-2xl border border-cream-border flex flex-wrap justify-between items-center gap-2 text-xs font-bold">
+                    <label className="flex items-center gap-2 cursor-pointer text-navy">
+                      <input
+                        type="checkbox"
+                        checked={locationAgreed}
+                        onChange={e => {
+                          setLocationAgreed(e.target.checked);
+                          triggerToast(e.target.checked ? '📍 위치정보 이용에 동의하셨습니다.' : '🔒 위치정보 수집이 차단되었습니다.');
+                        }}
+                        className="w-4 h-4 accent-coral"
+                      />
+                      <span>[위치정보 보호] 내 현재 위치 기반 거리 안내 기능 사용 동의 (미동의 시에도 공연장 기준 지도는 정상 이용 가능)</span>
+                    </label>
+                    <span className="text-coral">{locationAgreed ? '현재위치 연동 ON' : '공연장 기준 안전모드'}</span>
+                  </div>
+
+                  {/* 벡터 기반 인터랙티브 동선 맵 (사진 남용 대신 직관적 지도 다이어그램 제공) */}
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="lg:col-span-2 relative h-80 md:h-96 rounded-3xl bg-[#E8E4D9] border-2 border-navy overflow-hidden shadow-inner flex items-center justify-center">
+                      {/* 도로망 그리드 */}
+                      <div className="absolute inset-0 opacity-30" style={{ backgroundImage: 'radial-gradient(#1B2A4A 1.5px, transparent 1.5px)', backgroundSize: '20px 20px' }}></div>
+                      <div className="absolute top-1/2 left-0 right-0 h-4 bg-white/80 rotate-3"></div>
+                      <div className="absolute top-0 bottom-0 left-1/2 w-4 bg-white/80 -rotate-6"></div>
+
+                      {/* 중앙 콘서트장 마커 */}
+                      <div className="relative z-10 bg-navy text-white px-4 py-2 rounded-full border-2 border-white shadow-lg flex items-center gap-2 font-black text-sm">
+                        <Icon name="Tent" className="w-4 h-4 text-amber-300" />
+                        <span>🎪 {localCityFilter} 콘서트 공연장 (중심)</span>
+                      </div>
+
+                      {/* 주변 스팟 마커들 */}
+                      {LOCAL_SPOTS.filter(s => s.city === localCityFilter).map((sp, i) => {
+                        const posClasses = [
+                          'top-6 left-6',
+                          'top-8 right-6',
+                          'bottom-8 left-8',
+                          'bottom-6 right-6',
+                          'top-1/3 left-8'
+                        ][i % 5];
+                        const isSel = activeSpot.id === sp.id;
+                        return (
+                          <button
+                            key={sp.id}
+                            onClick={() => setSelectedSpotId(sp.id)}
+                            className={`absolute ${posClasses} z-20 px-3.5 py-2 rounded-2xl font-black text-xs shadow-md border-2 transition flex items-center gap-1.5 ${
+                              isSel ? 'bg-coral text-white border-white scale-110' : 'bg-white text-navy border-navy'
+                            }`}
+                          >
+                            <span>[{sp.category}] {sp.name}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* 우측 선택된 장소 상세 패널 */}
+                    <div className="bg-cream p-5 rounded-3xl border-2 border-navy flex flex-col justify-between space-y-4">
+                      <div className="space-y-3">
+                        <span className="bg-coral text-white text-xs font-black px-3 py-1 rounded-full">
+                          {activeSpot.category} · {activeSpot.recType}
+                        </span>
+                        <h3 className="text-xl font-black text-navy s-title">{activeSpot.name}</h3>
+                        <p className="text-xs font-bold text-gray-600 bg-white p-3 rounded-xl border border-cream-border">
+                          📌 출처: {activeSpot.recSource}
+                        </p>
+                        <div className="space-y-1.5 text-sm font-bold text-navy s-body">
+                          <p>• <strong>대표 메뉴/특징:</strong> {activeSpot.signature}</p>
+                          <p>• <strong>가격:</strong> {activeSpot.priceText}</p>
+                          <p>• <strong>영업시간:</strong> {activeSpot.hours}</p>
+                          <p>• <strong>주소:</strong> {activeSpot.address}</p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2 pt-3 border-t border-cream-border">
+                        <a
+                          href={`https://map.kakao.com/link/search/${encodeURIComponent(activeSpot.kakaoQuery)}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="w-full py-3.5 rounded-xl bg-[#FEE500] text-[#191919] font-black text-sm flex items-center justify-center gap-2 shadow-xs s-btn"
+                        >
+                          <Icon name="ExternalLink" className="w-4 h-4" />
+                          <span>카카오맵 실제 지도·길찾기 열기</span>
+                        </a>
+                        <button
+                          onClick={() => handleShareKakao(`📍 [TRIPTROT 지역 관광 안내]\n• 장소: ${activeSpot.name} (${activeSpot.category})\n• 특징: ${activeSpot.signature}\n• 주소: ${activeSpot.address}`)}
+                          className="w-full py-3 rounded-xl bg-navy text-white font-black text-xs s-btn"
+                        >
+                          카카오톡으로 위치 공유하기
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* =========================================================================
+                [메뉴 5: 프리미엄 투어 (상세 일정·포함/불포함·추가비용·취소 및 환불 규정)]
+               ========================================================================= */}
+            {activeMenu === 'premium' && (
+              <div className="space-y-6">
+                <div className="bg-navy text-white p-6 rounded-3xl space-y-2">
+                  <span className="bg-amber-400 text-navy text-xs font-black px-3 py-1 rounded-full">1~4인 소규모 맞춤형 컨시어지</span>
+                  <h2 className="text-2xl font-black mt-1 s-title">4. 프리미엄 효도·가족 동행 투어</h2>
+                  <p className="text-sm text-gray-200 s-body">
+                    전담 지역 청년 가이드가 전용차량으로 자택(또는 KTX역) 마중부터 식사·숙박·공연장 좌석 착석까지 전 과정을 에스코트합니다.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* 좌측: 담당 가이드 & 상세 이동 경로 + 포함/불포함 내역 */}
+                  <div className="bg-white p-6 rounded-3xl border-2 border-cream-border space-y-5">
+                    <div className="flex justify-between items-center border-b border-cream-border pb-3">
+                      <div>
+                        <span className="text-xs font-black text-coral">배정 담당 가이드</span>
+                        <h3 className="text-xl font-black text-navy s-title">김민지 청년 가이드 외 지역 전담팀</h3>
+                      </div>
+                      <button onClick={() => setActiveMenu('guide')} className="text-xs font-black text-navy underline">
+                        가이드 이력 상세보기 ➔
+                      </button>
+                    </div>
+
+                    <div className="space-y-2">
+                      <h4 className="font-black text-base text-navy">🚐 상세 이동 경로 및 타임라인 (1박 2일 기준)</h4>
+                      <ol className="text-sm font-bold text-gray-700 space-y-2 bg-cream p-4 rounded-2xl border border-cream-border s-body">
+                        <li>1. <strong>[11:00 마중]</strong> KTX역 승강장 앞 또는 자택 앞 전용 카니발/세단 픽업</li>
+                        <li>2. <strong>[12:00 중식]</strong> 지역 대표 맛집 입식 VIP룸 대기 없이 식사</li>
+                        <li>3. <strong>[14:00 관광]</strong> 무릎 부담 없는 평지 명소 및 전통시장 동행 쇼핑</li>
+                        <li>4. <strong>[16:00 공연]</strong> 공연장 화장실 안내 및 좌석 착석 확인 (자녀 카톡 사진 전송)</li>
+                        <li>5. <strong>[20:00 숙박]</strong> 4성급 제휴 호텔 체크인 대행 및 2일차 명소 투어 후 귀가</li>
+                      </ol>
+                    </div>
+
+                    {/* 식사·숙박·교통 포함 여부 명확 표기 */}
+                    <div className="space-y-2">
+                      <h4 className="font-black text-base text-navy">📋 포함 및 불포함 내역 (투명 공개)</h4>
+                      <div className="grid grid-cols-2 gap-3 text-xs font-bold">
+                        <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 space-y-1 text-emerald-950">
+                          <div className="font-black text-sm text-emerald-800 mb-1">✔ 포함 사항</div>
+                          <p>• 전용차량(유류·톨게이트비)</p>
+                          <p>• 청년 가이드 전담 동행비</p>
+                          <p>• 일정표상 특식 식대 전액</p>
+                          <p>• 숙박형 선택 시 4성급 호텔</p>
+                          <p>• 여행자보험 및 스냅 촬영</p>
+                        </div>
+                        <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 space-y-1 text-rose-950">
+                          <div className="font-black text-sm text-rose-700 mb-1">✖ 불포함 (추가 비용)</div>
+                          <p>• <strong>콘서트 티켓 대금 (본인 기보유)</strong></p>
+                          <p>• 1인 독실(싱글룸) 요청 시 +50,000원/박</p>
+                          <p>• 기본 일정 외 야간 연장 시 시간당 +20,000원</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 우측: 가격표 & 취소·환불 규정 및 시연 예약 */}
+                  <div className="bg-white p-6 rounded-3xl border-2 border-navy flex flex-col justify-between space-y-5">
+                    <div className="space-y-4">
+                      <h3 className="text-xl font-black text-navy s-title">💰 프리미엄 투어 가격 및 환불 규정</h3>
+
+                      <div className="grid grid-cols-3 gap-2 text-center">
+                        <div className="p-3.5 rounded-2xl bg-cream border border-cream-border">
+                          <span className="text-xs font-black text-gray-500 block">당일 에스코트</span>
+                          <span className="text-lg font-black text-navy block mt-1">189,000원</span>
+                          <span className="text-[11px] text-gray-500">1인 기준</span>
+                        </div>
+                        <div className="p-3.5 rounded-2xl bg-coral-light border-2 border-coral">
+                          <span className="text-xs font-black text-coral block">1박 2일 (인기)</span>
+                          <span className="text-lg font-black text-coral block mt-1">290,000원</span>
+                          <span className="text-[11px] text-gray-600">호텔·조식 포함</span>
+                        </div>
+                        <div className="p-3.5 rounded-2xl bg-cream border border-cream-border">
+                          <span className="text-xs font-black text-gray-500 block">2박 3일 VIP</span>
+                          <span className="text-lg font-black text-navy block mt-1">390,000원</span>
+                          <span className="text-[11px] text-gray-500">호텔 2박 포함</span>
+                        </div>
+                      </div>
+
+                      {/* 표준약관 기반 취소 및 환불 규정 명시 */}
+                      <div className="bg-cream p-4 rounded-2xl border border-cream-border space-y-2 text-xs font-bold text-gray-700">
+                        <h4 className="font-black text-sm text-navy flex items-center gap-1.5">
+                          <Icon name="ShieldAlert" className="w-4 h-4 text-coral" />
+                          <span>취소 및 환불 규정 (국내여행 표준약관 준수)</span>
+                        </h4>
+                        <ul className="space-y-1 pl-1">
+                          <li>• <strong>여행 출발 7일 전까지 취소:</strong> 결제 금액 <strong>100% 전액 무위약금 환불</strong></li>
+                          <li>• <strong>여행 출발 6일 ~ 3일 전까지:</strong> 결제 금액의 80% 환불 (위약금 20%)</li>
+                          <li>• <strong>여행 출발 2일 ~ 1일 전까지:</strong> 결제 금액의 50% 환불 (숙박·차량 선납금 공제)</li>
+                          <li>• <strong>공연 주최 측 사정 또는 천재지변으로 공연 취소 시:</strong> 조건 없이 <strong>100% 전액 환불 보장</strong></li>
+                        </ul>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2.5 pt-2">
+                      <button
+                        onClick={() => handleCreateReservation('프리미엄 컨시어지 투어 (1박 2일)', 290000, `[프리미엄] ${currentConcert.singer} ${currentConcert.city} 전담 동행`)}
+                        className="w-full py-4 rounded-2xl bg-coral text-white font-black text-base shadow-md s-btn"
+                      >
+                        [시연용] 프리미엄 투어 가예약 신청하기
+                      </button>
+                      <button
+                        onClick={() => setShowChildModal(true)}
+                        className="w-full py-3.5 rounded-2xl bg-navy text-white font-black text-sm s-btn"
+                      >
+                        💝 자녀가 부모님 대신 예약·결제하기 창 열기
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* =========================================================================
+                [메뉴 6: 청년 가이드 (확인된 교육 이력·코스·일정·후기·일자리 창출 현황)]
+               ========================================================================= */}
+            {activeMenu === 'guide' && (
+              <div className="space-y-6">
+                {/* 청년 일자리 창출 현황 요약 배너 */}
+                <div className="bg-navy text-white p-6 rounded-3xl space-y-4">
+                  <div className="flex flex-wrap justify-between items-center gap-2">
+                    <div>
+                      <span className="bg-emerald-500 text-white text-xs font-black px-3 py-1 rounded-full">지역 청년 일자리 창출 프로젝트</span>
+                      <h2 className="text-2xl font-black mt-2 s-title">5. 지역 청년 관광 가이드 프로필 및 활동 현황</h2>
+                      <p className="text-sm text-gray-200 s-body">허위 경력을 배제하고 지자체·관광공사 교육 수료가 확인된 청년 가이드만 활동합니다.</p>
+                    </div>
+                    <span className="bg-white/15 text-amber-300 text-xs font-black px-3 py-1.5 rounded-xl border border-white/20">
+                      📊 시연용 일자리 지표 포함
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-2">
+                    <div className="bg-white/10 p-4 rounded-2xl border border-white/15">
+                      <span className="text-xs text-gray-300 font-bold block">육성 수료 청년 가이드</span>
+                      <span className="text-2xl font-black text-amber-300">34명 <span className="text-xs font-normal">(4개 권역)</span></span>
+                    </div>
+                    <div className="bg-white/10 p-4 rounded-2xl border border-white/15">
+                      <span className="text-xs text-gray-300 font-bold block">누적 동행 활동 건수</span>
+                      <span className="text-2xl font-black text-white">142건 <span className="text-xs font-normal">(시연치)</span></span>
+                    </div>
+                    <div className="bg-white/10 p-4 rounded-2xl border border-white/15">
+                      <span className="text-xs text-gray-300 font-bold block">가이드 평균 활동 수당</span>
+                      <span className="text-2xl font-black text-emerald-300">회당 12만원</span>
+                    </div>
+                    <div className="bg-white/10 p-4 rounded-2xl border border-white/15">
+                      <span className="text-xs text-gray-300 font-bold block">어르신·자녀 만족도</span>
+                      <span className="text-2xl font-black text-amber-300">4.92 / 5.0</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 청년 가이드 프로필 카드 (사진 대신 깔끔한 아바타 아이콘 활용) */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                  {YOUTH_GUIDES.map(g => (
+                    <div key={g.id} className="bg-white p-6 rounded-3xl border-2 border-cream-border flex flex-col justify-between space-y-4 shadow-xs">
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-3.5">
+                          <div className="w-14 h-14 rounded-2xl bg-navy text-white flex flex-col items-center justify-center shrink-0">
+                            <Icon name="UserCheck" className="w-6 h-6 text-coral" />
+                            <span className="text-[10px] font-black mt-0.5">{g.region.split(' ')[0]}</span>
+                          </div>
+                          <div>
+                            <span className="text-xs font-black text-coral">{g.region} 전담</span>
+                            <h3 className="text-xl font-black text-navy s-title">{g.name} ({g.age}세)</h3>
+                            <span className="text-xs font-bold text-gray-500">누적 동행 {g.activityCount}건 · 평점 ★{g.rating}</span>
+                          </div>
+                        </div>
+
+                        <div className="text-xs font-bold text-navy bg-cream p-3 rounded-xl border border-cream-border">
+                          🎯 <strong>전문 분야:</strong> {g.specialty}
+                        </div>
+
+                        {/* 확인된 교육·자격 이력 */}
+                        <div className="space-y-1">
+                          <span className="text-xs font-black text-emerald-800 block">✔ 확인된 교육 및 자격 이력</span>
+                          <ul className="text-xs font-semibold text-gray-700 space-y-1 bg-emerald-50/60 p-3 rounded-xl border border-emerald-200">
+                            {g.verifiedHistory.map((h, i) => (
+                              <li key={i}>• {h}</li>
+                            ))}
+                          </ul>
+                        </div>
+
+                        <div className="text-xs font-bold text-gray-700 space-y-1">
+                          <p>🗺️ <strong>담당 코스:</strong> {g.courseTitle}</p>
+                          <p>📅 <strong>활동 가능 일정:</strong> <span className="text-coral font-black">{g.availableDates.join(', ')}</span></p>
+                        </div>
+
+                        {/* 시연용 후기 구분 표시 */}
+                        <div className="bg-gray-50 p-3 rounded-xl border text-xs space-y-1">
+                          <span className="text-[10px] font-black text-gray-400 block">[시연용 후기 데이터]</span>
+                          <p className="text-gray-700 font-medium">"{g.reviews[0].text}"</p>
+                          <span className="text-[11px] font-bold text-navy block">- {g.reviews[0].author}</span>
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={() => handleCreateReservation(`청년 가이드 동행 (${g.name})`, 189000, `[${g.name} 배정] ${g.courseTitle}`)}
+                        className="w-full py-3.5 rounded-xl bg-navy hover:bg-navy-light text-white font-black text-xs s-btn"
+                      >
+                        [시연용] {g.name} 동행 예약 신청
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* =========================================================================
+                [메뉴 7: 팬클럽 단체 여행 (기존 총무 관리 기능 100% 보존 + 체류형 대관)]
+               ========================================================================= */}
+            {activeMenu === 'fanclub' && (
+              <div className="space-y-6">
+                <div className="bg-navy text-white p-6 rounded-3xl flex flex-col md:flex-row justify-between md:items-center gap-4">
+                  <div>
+                    <span className="bg-coral text-white text-xs font-black px-3 py-1 rounded-full">팬클럽 총무 전용 B2B 대시보드</span>
+                    <h2 className="text-2xl font-black mt-2 s-title">6. 팬클럽 단체 여행 및 참석자·입금·QR 통합 관리</h2>
+                    <p className="text-sm text-gray-200 s-body">단체 초대 링크 발송부터 호차 배정, 대형버스 주차 확보식당·단체숙박 예약을 한 곳에서 관리하세요.</p>
+                  </div>
+                  <button
+                    onClick={() => handleShareKakao(`📢 [팬클럽 원정단 단체 신청 및 호차 확인 링크]\n• 공연: ${currentConcert.title}\n• 아래 링크에서 참석 여부와 입금 상태를 확인해 주세요!`)}
+                    className="px-5 py-3.5 rounded-xl bg-[#FEE500] text-[#191919] font-black text-xs shrink-0"
+                  >
+                    💬 단톡방 단체 초대링크 공유
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  {/* 좌측 2칸: 참석자·입금·버스 배정·QR 체크인 관리 */}
+                  <div className="lg:col-span-2 bg-white p-6 rounded-3xl border-2 border-cream-border space-y-4">
+                    <div className="flex justify-between items-center">
+                      <h3 className="text-lg font-black text-navy s-title">👥 참석자 명단 · 입금 · 호차 · QR 체크인</h3>
+                      <span className="text-xs font-bold text-gray-500">총 {clubMembers.length}명 신청</span>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <input
+                        value={newClubMemberName}
+                        onChange={e => setNewClubMemberName(e.target.value)}
+                        placeholder="추가할 회원 닉네임 (예: 최순덕 마산)"
+                        className="flex-1 p-3 rounded-xl bg-cream border border-cream-border text-sm font-bold"
+                      />
+                      <button
+                        onClick={() => {
+                          if (!newClubMemberName.trim()) return;
+                          setClubMembers([...clubMembers, { id: Date.now(), name: newClubMemberName, paid: false, bus: '1호차', stay: '1박 2일', qr: false }]);
+                          setNewClubMemberName('');
+                          triggerToast('✅ 단체 명단에 회원이 추가되었습니다.');
+                        }}
+                        className="px-5 py-3 rounded-xl bg-navy text-white font-black text-xs"
+                      >
+                        + 명단 추가
+                      </button>
+                    </div>
+
+                    <div className="space-y-2.5">
+                      {clubMembers.map((m, idx) => (
+                        <div key={m.id} className="p-3.5 rounded-2xl bg-cream/60 border border-cream-border flex flex-wrap justify-between items-center gap-2 text-xs">
+                          <span className="font-black text-sm text-navy">{idx + 1}. {m.name}</span>
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              onClick={() => {
+                                const copy = [...clubMembers];
+                                copy[idx].paid = !copy[idx].paid;
+                                setClubMembers(copy);
+                              }}
+                              className={`px-3 py-1.5 rounded-lg font-black ${m.paid ? 'bg-emerald-700 text-white' : 'bg-coral-light text-coral border border-coral'}`}
+                            >
+                              {m.paid ? '입금완료' : '미입금'}
+                            </button>
+                            <button
+                              onClick={() => {
+                                const copy = [...clubMembers];
+                                copy[idx].bus = copy[idx].bus === '1호차' ? '2호차' : '1호차';
+                                setClubMembers(copy);
+                              }}
+                              className="px-3 py-1.5 rounded-lg bg-white border border-cream-border font-black text-navy"
+                            >
+                              🚌 {m.bus}
+                            </button>
+                            <button
+                              onClick={() => {
+                                const copy = [...clubMembers];
+                                copy[idx].qr = !copy[idx].qr;
+                                setClubMembers(copy);
+                              }}
+                              className={`px-3 py-1.5 rounded-lg font-black ${m.qr ? 'bg-navy text-amber-300' : 'bg-gray-200 text-gray-700'}`}
+                            >
+                              {m.qr ? 'QR탑승완료 ✔' : 'QR체크인'}
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 우측 1칸: 랩핑버스 대형주차 + 40인 식당/숙박 일괄 대관 패스 */}
+                  <div className="bg-white p-6 rounded-3xl border-2 border-navy flex flex-col justify-between space-y-4">
+                    <div className="space-y-3">
+                      <span className="bg-coral text-white text-xs font-black px-3 py-1 rounded-full">지부 자체 랩핑버스 환영</span>
+                      <h3 className="text-xl font-black text-navy s-title">🚩 40인 단체 식사 · 대형버스 주차 · 단체숙박 패스</h3>
+                      <p className="text-xs text-gray-600 font-bold leading-relaxed s-body">
+                        버스는 팬클럽의 자체 랩핑버스를 그대로 타고 오세요! 타지역에서 가장 섭외하기 힘든 <strong>45인승 주차 확보 식당, 굿즈 나눔 카페 대관, 단체 호텔 객실 블록</strong>만 원스톱으로 예약해 드립니다.
+                      </p>
+                      <div className="bg-cream p-3.5 rounded-2xl border border-cream-border space-y-1.5 text-xs font-bold">
+                        <div className="flex justify-between"><span>• 40석 식당 사전세팅 + 버스주차</span><span>18,000원/인</span></div>
+                        <div className="flex justify-between"><span>• 성지 카페 대관 + 환영 현수막</span><span>7,000원/인</span></div>
+                        <div className="flex justify-between text-emerald-700 font-black"><span>• 단체 선결제 제휴 할인</span><span>-4,000원/인</span></div>
+                        <div className="border-t border-cream-border pt-1.5 flex justify-between text-sm font-black text-coral">
+                          <span>1인당 현지 회비</span><span>21,000원</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => handleCreateReservation('팬클럽 단체 식사·주차 패스 (40인)', 21000, `[팬클럽 단체] ${currentConcert.city} 40인 식당·주차 패스`)}
+                      className="w-full py-4 rounded-xl bg-coral text-white font-black text-sm s-btn"
+                    >
+                      [시연용] 단체 식사·주차 패스 예약
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* =========================================================================
+                [메뉴 8: 지자체 협업 (지역 경제 파급효과 & 청년 일자리 대시보드)]
+               ========================================================================= */}
+            {activeMenu === 'gov' && (
+              <div className="space-y-6">
+                <div className="bg-navy text-white p-6 rounded-3xl space-y-2">
+                  <div className="flex flex-wrap justify-between items-center gap-2">
+                    <span className="bg-amber-400 text-navy text-xs font-black px-3 py-1 rounded-full">B2G 지자체 · 지역 관광공사 상생 대시보드</span>
+                    <span className="bg-coral text-white text-xs font-black px-3 py-1 rounded-full">실측 탐색조사 데이터 vs 시연용 시뮬레이션 명확 구분</span>
+                  </div>
+                  <h2 className="text-2xl font-black mt-1 s-title">7. 지자체 협업 및 지역 경제 활성화 성과 대시보드</h2>
+                  <p className="text-sm text-gray-200 s-body">
+                    당일치기 콘서트 관람객을 지역 식당·전통시장·숙박 소비로 전환하여 지방 소멸 위기 지역의 체류 소비액과 청년 일자리를 창출합니다.
+                  </p>
+                </div>
+
+                {/* [구분 1] 실제 수행한 현장 탐색조사 데이터 (2026.10.13 진주 남강 조사) */}
+                <div className="bg-white p-6 rounded-3xl border-2 border-emerald-600 space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span className="bg-emerald-700 text-white text-xs font-black px-3 py-1 rounded-full">✔ 실제 대면 탐색조사 실측 데이터 (Fact)</span>
+                    <span className="text-xs font-bold text-gray-500">조사일: 2026.10.13 | 장소: 진주 남강 일대 | 표본: 30~70대 30명</span>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200">
+                      <span className="text-xs font-black text-emerald-900 block">지방 공연 방문 시 예매 불편 비율</span>
+                      <span className="text-3xl font-black text-emerald-800 block mt-1">37.0%</span>
+                      <span className="text-xs text-gray-600 font-bold">불편 요인 전체 1위 기록</span>
+                    </div>
+                    <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200">
+                      <span className="text-xs font-black text-emerald-900 block">타지역 교통·이동 불편 비율</span>
+                      <span className="text-3xl font-black text-emerald-800 block mt-1">33.3%</span>
+                      <span className="text-xs text-gray-600 font-bold">예매+교통 장벽이 70.3% 차지</span>
+                    </div>
+                    <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200">
+                      <span className="text-xs font-black text-emerald-900 block">공연+여행 결합 서비스 이용 의향</span>
+                      <span className="text-3xl font-black text-coral block mt-1">70.4%</span>
+                      <span className="text-xs text-gray-600 font-bold">‘매우 그렇다’ 긍정 응답 비율</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* [구분 2] 지자체 협업 시연용 시뮬레이션 지표 (방문객·숙박·소비액·제휴업체·청년일자리) */}
+                <div className="bg-white p-6 rounded-3xl border-2 border-cream-border space-y-5">
+                  <div className="flex flex-wrap justify-between items-center gap-2">
+                    <h3 className="text-xl font-black text-navy s-title">📊 지자체별 관광 유입 및 지역 소비 시뮬레이션 지표</h3>
+                    <span className="bg-amber-100 text-amber-950 border border-amber-300 text-xs font-black px-3 py-1 rounded-full">
+                      ⚠️ 아래 수치는 지자체 B2G 제안용 시연(Simulation) 데이터입니다
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+                    <div className="p-4 rounded-2xl bg-cream border border-cream-border">
+                      <span className="text-xs font-bold text-gray-500 block">등록 관광 상품</span>
+                      <span className="text-xl font-black text-navy block mt-1">12개 코스</span>
+                      <span className="text-[11px] text-coral font-bold">4개 도시 체류형</span>
+                    </div>
+                    <div className="p-4 rounded-2xl bg-cream border border-cream-border">
+                      <span className="text-xs font-bold text-gray-500 block">지역 제휴 업체</span>
+                      <span className="text-xl font-black text-navy block mt-1">48개소</span>
+                      <span className="text-[11px] text-gray-600 font-bold">식당·시장·숙박·공방</span>
+                    </div>
+                    <div className="p-4 rounded-2xl bg-cream border border-cream-border">
+                      <span className="text-xs font-bold text-gray-500 block">유입 방문객 수</span>
+                      <span className="text-xl font-black text-navy block mt-1">1,840명</span>
+                      <span className="text-[11px] text-emerald-700 font-bold">타지역 유입 89%</span>
+                    </div>
+                    <div className="p-4 rounded-2xl bg-cream border border-cream-border">
+                      <span className="text-xs font-bold text-gray-500 block">숙박 예약 전환</span>
+                      <span className="text-xl font-black text-coral block mt-1">620실</span>
+                      <span className="text-[11px] text-gray-600 font-bold">체류 전환율 42%</span>
+                    </div>
+                    <div className="p-4 rounded-2xl bg-cream border border-cream-border">
+                      <span className="text-xs font-bold text-gray-500 block">지역 상권 소비액</span>
+                      <span className="text-xl font-black text-navy block mt-1">2.4억 원</span>
+                      <span className="text-[11px] text-emerald-700 font-bold">1인 평균 13만원 소비</span>
+                    </div>
+                    <div className="p-4 rounded-2xl bg-cream border border-cream-border">
+                      <span className="text-xs font-bold text-gray-500 block">청년 가이드 활동</span>
+                      <span className="text-xl font-black text-navy block mt-1">34명 / 142건</span>
+                      <span className="text-[11px] text-coral font-bold">지역 청년 일자리</span>
+                    </div>
+                  </div>
+
+                  {/* 도시별 제휴 상권 및 체류 시간 비교 막대 그래프 */}
+                  <div className="bg-cream p-5 rounded-2xl border border-cream-border space-y-3">
+                    <h4 className="font-black text-sm text-navy">📈 일반 공연 관람객 vs TRIPTROT 체류형 관광객 지역 소비 비교 (시연 모델)</h4>
+                    <div className="space-y-2 text-xs font-bold">
+                      <div>
+                        <div className="flex justify-between mb-1">
+                          <span>기존 단순 셔틀 관람객 (평균 체류 3.5시간 · 공연만 보고 즉시 귀가)</span>
+                          <span>1인 평균 지역 소비: 18,000원</span>
+                        </div>
+                        <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
+                          <div className="w-[15%] h-full bg-gray-500"></div>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="flex justify-between mb-1 text-coral font-black">
+                          <span>TRIPTROT 체류형 관광객 (평균 체류 18.5시간 · 맛집+전통시장+지역숙박 연결)</span>
+                          <span>1인 평균 지역 소비: 132,000원 (7.3배 증가)</span>
+                        </div>
+                        <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
+                          <div className="w-[88%] h-full bg-coral"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+          </main>
+
+          {/* ================= 모바일 하단 고정 빠른 메뉴 바 ================= */}
+          <div className="fixed bottom-0 inset-x-0 bg-white border-t-2 border-cream-border z-30 md:hidden">
+            <div className="grid grid-cols-5 text-center py-1.5">
+              {[
+                { key: 'home', label: '홈', icon: 'home' },
+                { key: 'concert', label: '공연여행', icon: 'bus' },
+                { key: 'local', label: '지역관광', icon: 'compass' },
+                { key: 'guide', label: '청년가이드', icon: 'user-check' },
+                { key: 'gov', label: '지자체협업', icon: 'bar-chart-3' }
+              ].map(m => (
+                <button
+                  key={m.key}
+                  onClick={() => setActiveMenu(m.key as MenuKey)}
+                  className={`flex flex-col items-center py-1 ${activeMenu === m.key ? 'text-coral font-black' : 'text-gray-500 font-bold'}`}
+                >
+                  <Icon name={m.icon} className="w-5 h-5" />
+                  <span className="text-[11px] mt-0.5">{m.label}</span>
+                </button>
+              ))}
             </div>
-          `);
-        });
-      }
-      document.getElementById('adminModal').classList.remove('hidden');
-    }
+          </div>
 
-    function closeAdminModal() {
-      document.getElementById('adminModal').classList.add('hidden');
-    }
+          {/* ================= [모달 1] 시연용 예약 확인 및 QR 체크인 보관함 ================= */}
+          {showResModal && (
+            <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+              <div className="bg-white w-full max-w-lg rounded-3xl p-6 space-y-4 shadow-2xl border-2 border-navy max-h-[85vh] flex flex-col">
+                <div className="flex justify-between items-center border-b pb-3">
+                  <div>
+                    <span className="bg-coral text-white text-[11px] font-black px-2.5 py-0.5 rounded-full">실제 결제 미발생 · 시연용 바우처</span>
+                    <h3 className="text-xl font-black text-navy mt-1">🎟️ 나의 예약 내역 (전화번호 보호 적용)</h3>
+                  </div>
+                  <button onClick={() => setShowResModal(false)} className="text-2xl font-black text-gray-400">&times;</button>
+                </div>
 
-    function adminAddConcert() {
-      const singer = document.getElementById('adm-singer').value.trim();
-      const city = document.getElementById('adm-city').value.trim();
-      const date = document.getElementById('adm-date').value.trim();
-      const venue = document.getElementById('adm-venue').value.trim();
-      if (!singer || !city || !date || !venue) {
-        showToast('가수명, 지역, 일시, 장소를 모두 입력해 주세요.');
-        return;
-      }
-      concertsDB.push({
-        id: 'c' + Date.now(),
-        singer: singer,
-        city: city,
-        title: `2026 ${singer} 전국투어 콘서트 [${city}]`,
-        dates: [date],
-        venue: venue,
-        meetupSpot: `${venue} 정문 1번 기둥 앞 (노란 깃발)`,
-        price: 59000,
-        origins: [
-          { name: `진주종합경기장 정문 앞 (09:30 출발)`, time: '09:30' },
-          { name: `${city}역(KTX) 마중 픽업 (11:30 출발)`, time: '11:30' }
-        ],
-        timeline: DEFAULT_CONCERTS[0].timeline
-      });
-      saveDB();
-      renderAllViews();
-      closeAdminModal();
-      showToast(`🎉 [${singer} ${city} 콘서트]가 데이터베이스에 추가되어 전 메뉴에 자동 연동되었습니다!`);
-    }
+                <div className="space-y-3 overflow-y-auto flex-1">
+                  {reservations.map((r, i) => (
+                    <div key={r.id} className="p-4 rounded-2xl bg-cream border border-cream-border space-y-1.5 text-xs">
+                      <div className="flex justify-between items-center">
+                        <span className="bg-navy text-white font-black px-2.5 py-0.5 rounded-full">{r.category}</span>
+                        <span className="font-mono font-bold text-gray-500">{r.id}</span>
+                      </div>
+                      <h4 className="font-black text-base text-navy pt-1">{r.title}</h4>
+                      <p className="font-bold text-gray-700">• 예약자: {r.guestName} ({r.pax}명) / 연락처: {r.maskedPhone}</p>
+                      <p className="font-bold text-gray-700">• 일시/유형: {r.date} ({r.stayType})</p>
+                      <p className="font-bold text-gray-700">• 탑승장소: {r.origin}</p>
+                      <p className="font-black text-emerald-700">• 상태: {r.status}</p>
+                      <div className="pt-2 border-t border-cream-border flex justify-between items-center">
+                        <span className="font-black text-base text-coral">{r.totalPrice}</span>
+                        <button
+                          onClick={() => handleShareKakao(`🎟️ [TRIPTROT 시연용 예약 바우처]\n• 상품: ${r.title} (${r.stayType})\n• 일시: ${r.date}\n• 탑승: ${r.origin}`)}
+                          className="px-3 py-1.5 rounded-xl bg-[#FEE500] text-[#191919] font-black"
+                        >
+                          💬 카톡 공유
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
 
-    function deleteRes(idx) {
-      reservationsDB.splice(idx, 1);
-      saveDB();
-      openAdminModal();
-    }
+                <button onClick={() => setShowResModal(false)} className="w-full py-3.5 rounded-xl bg-navy text-white font-black text-sm">
+                  닫기
+                </button>
+              </div>
+            </div>
+          )}
 
-    function resetAllDatabase() {
-      localStorage.clear();
-      concertsDB = DEFAULT_CONCERTS;
-      reservationsDB = [];
-      clubMembersDB = DEFAULT_CLUB_MEMBERS;
-      renderAllViews();
-      closeAdminModal();
-      showToast('🔄 데이터베이스가 초기 상태로 리셋되었습니다.');
-    }
+          {/* ================= [모달 2] 자녀 안심 대리예약 및 실시간 탑승 트래커 (기존 기능 보존) ================= */}
+          {showChildModal && (
+            <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+              <div className="bg-white w-full max-w-lg rounded-3xl p-6 space-y-4 shadow-2xl border-2 border-navy max-h-[88vh] overflow-y-auto">
+                <div className="flex justify-between items-center border-b pb-3">
+                  <div>
+                    <span className="bg-navy text-amber-300 text-xs font-black px-2.5 py-0.5 rounded-full">가족 안심 동행 서비스</span>
+                    <h3 className="text-xl font-black text-navy mt-1">💝 자녀 대리 예약 & 실시간 부모님 동행 알림</h3>
+                  </div>
+                  <button onClick={() => setShowChildModal(false)} className="text-2xl font-black text-gray-400">&times;</button>
+                </div>
 
-    function showToast(msg) {
-      const t = document.getElementById('toastBox');
-      t.innerText = msg;
-      t.classList.remove('hidden');
-      setTimeout(() => t.classList.add('hidden'), 3200);
-    }
+                <div className="bg-cream p-4 rounded-2xl border border-cream-border space-y-2.5 text-xs">
+                  <div className="flex justify-between items-center">
+                    <span className="font-black text-sm text-navy">🔔 부모님 당일 이동 상태 (시연 시뮬레이션)</span>
+                    <button
+                      onClick={() => setChildStep((childStep % 4) + 1)}
+                      className="px-2.5 py-1 rounded-lg bg-navy text-white font-black"
+                    >
+                      다음 단계 시연 ➔
+                    </button>
+                  </div>
+                  {[
+                    '1단계: 출발지 셔틀버스 안전 탑승 확인 (09:35)',
+                    '2단계: 사전 예약 맛집 도착 및 중식 완료 (12:20)',
+                    '3단계: 공연장 도착 및 화장실·좌석 착석 에스코트 완료 (16:30)',
+                    '4단계: 공연 종료 후 귀가 차량 또는 숙소 체크인 완료 (20:10)'
+                  ].map((st, idx) => (
+                    <div key={idx} className={`p-2.5 rounded-xl font-bold flex items-center gap-2 ${idx < childStep ? 'bg-white border border-emerald-300 text-navy' : 'opacity-40'}`}>
+                      <span className="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px]">✔</span>
+                      <span>{st}</span>
+                    </div>
+                  ))}
+                </div>
 
-    function renderAllViews() {
-      renderSeniorStep1Singers();
-      renderSeniorStep2Dates();
-      renderSeniorStep3Origins();
-      updateSeniorSummary();
-      renderScheduleTimeline();
-      renderChildView();
-      renderClubDashboard();
-      updateHeaderBadge();
-    }
+                <button
+                  onClick={() => {
+                    setShowChildModal(false);
+                    handleCreateReservation('자녀 대리 효도예약 (1박 2일)', 149000);
+                  }}
+                  className="w-full py-4 rounded-xl bg-coral text-white font-black text-sm"
+                >
+                  [시연용] 부모님 대신 예약 등록 및 카카오톡 일정 발송
+                </button>
+              </div>
+            </div>
+          )}
 
-    window.onload = () => {
-      renderAllViews();
+          {/* 토스트 메시지 */}
+          {toastMsg && (
+            <div className="fixed top-20 left-1/2 -translate-x-1/2 w-[90%] max-w-md bg-navy text-white px-5 py-3.5 rounded-2xl shadow-2xl text-xs font-black text-center z-50 border border-amber-300">
+              {toastMsg}
+            </div>
+          )}
+
+        </div>
+      );
     };
+
+    const root = ReactDOM.createRoot(document.getElementById('root')!);
+    root.render(<App />);
   </script>
 </body>
 </html>
