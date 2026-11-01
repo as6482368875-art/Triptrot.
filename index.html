@@ -67,18 +67,18 @@
 </head>
 <body class="min-h-screen flex flex-col pb-24">
 
-  <!-- 최상단 시연 고지 바 -->
+  <!-- 최상단 한 줄 요약 바 -->
   <div class="bg-navy-dark text-cream px-4 py-2 text-xs font-semibold">
     <div class="max-w-5xl mx-auto flex justify-between items-center">
       <div class="flex items-center gap-2">
         <span class="bg-coral text-white font-black px-2 py-0.5 rounded text-[11px]">시연용 MVP</span>
-        <span>실제 결제가 발생하지 않는 시연 환경입니다 · 예약은 [2. 맞춤 코스 & 예약] 탭에서 한 번에 진행됩니다.</span>
+        <span>코스 설계·로컬 가이드 확인·예약이 모두 [2. 맞춤 코스 & 통합예약] 탭 한 곳에서 해결됩니다.</span>
       </div>
       <button onclick="switchMenu('gov')" class="text-amber-300 font-bold hover:underline shrink-0">🏛️ 지자체 협업 ➔</button>
     </div>
   </div>
 
-  <!-- 상단 고정 헤더 & 심플해진 5대 메뉴 탭 -->
+  <!-- 상단 고정 헤더 & 초간단 4대 메뉴 탭 -->
   <header class="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-cream-border shadow-2xs">
     <div class="max-w-5xl mx-auto px-5 py-3.5 flex justify-between items-center">
       <div onclick="switchMenu('home')" class="cursor-pointer flex items-center gap-2.5">
@@ -107,23 +107,20 @@
       </div>
     </div>
 
-    <!-- 🔥 8개에서 5개로 깔끔하게 압축된 메인 메뉴 탭 -->
-    <nav class="max-w-5xl mx-auto px-5 py-2.5 overflow-x-auto no-scrollbar bg-cream/60 border-t border-cream-border">
-      <div class="grid grid-cols-5 gap-1.5 min-w-[460px]">
-        <button onclick="switchMenu('home')" id="nav-home" class="nav-btn toss-btn py-2.5 px-3 rounded-2xl font-extrabold text-xs sm:text-sm bg-navy text-white shadow-xs">
-          1. 홈
+    <!-- 🔥 상품 탭을 없애고 4개로 완벽히 압축된 메인 네비게이션 -->
+    <nav class="max-w-5xl mx-auto px-5 py-2.5 bg-cream/60 border-t border-cream-border">
+      <div class="grid grid-cols-4 gap-2">
+        <button onclick="switchMenu('home')" id="nav-home" class="nav-btn toss-btn py-2.5 px-2 rounded-2xl font-extrabold text-xs sm:text-sm bg-navy text-white shadow-xs">
+          1. 홈 (가수선택)
         </button>
-        <button onclick="switchMenu('booking')" id="nav-booking" class="nav-btn toss-btn py-2.5 px-3 rounded-2xl font-extrabold text-xs sm:text-sm bg-coral text-white shadow-xs">
-          🪄 2. 맞춤 코스 & 예약
+        <button onclick="switchMenu('booking')" id="nav-booking" class="nav-btn toss-btn py-2.5 px-2 rounded-2xl font-extrabold text-xs sm:text-sm bg-coral text-white shadow-xs">
+          🪄 2. 맞춤 코스 & 통합예약
         </button>
-        <button onclick="switchMenu('package')" id="nav-package" class="nav-btn toss-btn py-2.5 px-3 rounded-2xl font-bold text-xs sm:text-sm bg-white text-navy border border-cream-border">
-          🧑‍✈️ 3. 상품 & 로컬가이드
+        <button onclick="switchMenu('fanclub')" id="nav-fanclub" class="nav-btn toss-btn py-2.5 px-2 rounded-2xl font-bold text-xs sm:text-sm bg-white text-navy border border-cream-border">
+          🚩 3. 팬클럽 단체
         </button>
-        <button onclick="switchMenu('fanclub')" id="nav-fanclub" class="nav-btn toss-btn py-2.5 px-3 rounded-2xl font-bold text-xs sm:text-sm bg-white text-navy border border-cream-border">
-          🚩 4. 팬클럽 단체
-        </button>
-        <button onclick="switchMenu('gov')" id="nav-gov" class="nav-btn toss-btn py-2.5 px-3 rounded-2xl font-bold text-xs sm:text-sm bg-white text-navy border border-cream-border">
-          🏛️ 5. 지자체 협업
+        <button onclick="switchMenu('gov')" id="nav-gov" class="nav-btn toss-btn py-2.5 px-2 rounded-2xl font-bold text-xs sm:text-sm bg-white text-navy border border-cream-border">
+          🏛️ 4. 지자체 협업
         </button>
       </div>
     </nav>
@@ -133,72 +130,75 @@
   <main class="max-w-5xl w-full mx-auto px-5 py-7 flex-1 space-y-7">
 
     <!-- =========================================================================
-         [탭 1: 홈 - 내 가수 선택 + 핵심 정체성]
+         [탭 1: 홈 - 처음 보는 사람도 3초 만에 이해하는 3단계 가이드 & 가수 선택]
          ========================================================================= -->
     <section id="page-home" class="space-y-7">
       
-      <!-- 메인 히어로 카드 -->
-      <div class="toss-card bg-navy text-white p-7 md:p-10 flex flex-col md:flex-row justify-between items-center gap-6">
-        <div class="space-y-4 max-w-xl">
-          <span class="inline-block bg-coral text-white text-xs font-extrabold px-3.5 py-1 rounded-full">
-            트롯 팬덤 기반 체류형 관광 플랫폼
-          </span>
-          <h1 class="text-3xl md:text-4xl font-black leading-tight s-h1">
-            “공연이 끝나도,<br />여행은 끝나지 않도록.”
-          </h1>
-          <div class="space-y-1 text-amber-300 font-bold text-sm md:text-base s-body">
-            <p>✔ 콘서트 관람객을 지역의 관광객으로 바꿉니다</p>
-            <p>✔ AI가 여행을 설계하고, 청년 로컬 가이드가 완성합니다</p>
+      <!-- 메인 배너 + 3초 이해 프로세스 -->
+      <div class="toss-card bg-navy text-white p-7 md:p-10 space-y-6">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+          <div class="space-y-3 max-w-xl">
+            <span class="inline-block bg-coral text-white text-xs font-extrabold px-3.5 py-1 rounded-full">
+              트롯 팬덤 기반 체류형 지역관광 플랫폼
+            </span>
+            <h1 class="text-3xl md:text-4xl font-black leading-tight s-h1">
+              “공연이 끝나도,<br />여행은 끝나지 않도록.”
+            </h1>
+            <p class="text-cream/90 text-sm md:text-base font-medium leading-relaxed s-body">
+              트롯 콘서트 관람객을 지역 맛집·전통시장·숙박으로 연결하고,<br class="hidden sm:inline" />
+              지역 청년 로컬 가이드가 안전한 이동과 여행을 책임집니다.
+            </p>
           </div>
-          <div class="pt-2 flex flex-wrap gap-2.5">
-            <button onclick="switchMenu('booking')" class="toss-btn px-6 py-4 rounded-2xl bg-coral text-white font-black text-sm shadow-lg flex items-center gap-2">
-              <span>🪄 내 가수 맞춤 코스 짜고 바로 예약하기</span>
-              <i class="fa-solid fa-arrow-right"></i>
-            </button>
-            <button onclick="switchMenu('fanclub')" class="toss-btn px-5 py-4 rounded-2xl bg-cream text-navy font-black text-sm shadow-md">
-              🚩 팬클럽 단체 여행
-            </button>
-          </div>
+
+          <button onclick="switchMenu('booking')" class="toss-btn w-full md:w-auto px-7 py-5 rounded-3xl bg-coral hover:bg-coral-dark text-white font-black text-base shadow-xl flex items-center justify-center gap-2.5 shrink-0">
+            <span>🪄 코스 짜고 바로 예약하러 가기</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
         </div>
 
-        <!-- 토스형 4대 가치 아이콘 블록 -->
-        <div class="grid grid-cols-2 gap-3 w-full md:w-72 shrink-0">
-          <div class="bg-white/10 p-4 rounded-3xl text-center space-y-1 border border-white/10">
-            <div class="text-3xl">🎤</div>
-            <div class="font-black text-xs text-white">내 가수 선택</div>
-            <div class="text-[11px] text-amber-300 font-bold">맞춤 일정 자동연동</div>
-          </div>
-          <div class="bg-white/10 p-4 rounded-3xl text-center space-y-1 border border-white/10">
-            <div class="text-3xl">🍲</div>
-            <div class="font-black text-xs text-white">맛집·전통시장</div>
-            <div class="text-[11px] text-amber-300 font-bold">지역상권 소비</div>
-          </div>
-          <div class="bg-white/10 p-4 rounded-3xl text-center space-y-1 border border-white/10">
-            <div class="text-3xl">🧑‍✈️</div>
-            <div class="font-black text-xs text-white">로컬 가이드</div>
-            <div class="text-[11px] text-amber-300 font-bold">청년 일자리 창출</div>
-          </div>
-          <div class="bg-coral p-4 rounded-3xl text-center space-y-1 shadow-md">
-            <div class="text-3xl">🏨</div>
-            <div class="font-black text-xs text-white">당일~2박3일</div>
-            <div class="text-[11px] text-white/90 font-bold">체류형 관광</div>
+        <!-- 💡 처음 보는 사람을 위한 '어떻게 이용하나요?' 3단계 직관적 번호표 -->
+        <div class="pt-4 border-t border-white/15">
+          <div class="text-xs font-extrabold text-amber-300 mb-3">💡 처음 오셨나요? 딱 3단계면 공연 여행 준비가 끝납니다!</div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div onclick="document.getElementById('home-singer-box').scrollIntoView({behavior:'smooth'})" class="cursor-pointer bg-white/10 hover:bg-white/15 p-4 rounded-2xl border border-white/10 flex items-center gap-3.5">
+              <div class="w-10 h-10 rounded-xl bg-amber-400 text-navy font-black text-base flex items-center justify-center shrink-0">1</div>
+              <div>
+                <div class="font-black text-sm text-white">내 트롯 가수 선택</div>
+                <div class="text-xs text-cream/75">보러 갈 가수와 당일~2박3일 선택</div>
+              </div>
+            </div>
+
+            <div onclick="switchMenu('booking')" class="cursor-pointer bg-white/10 hover:bg-white/15 p-4 rounded-2xl border border-white/10 flex items-center gap-3.5">
+              <div class="w-10 h-10 rounded-xl bg-coral text-white font-black text-base flex items-center justify-center shrink-0">2</div>
+              <div>
+                <div class="font-black text-sm text-white">AI 코스 & 로컬 가이드 확인</div>
+                <div class="text-xs text-cream/75">효도·맛집·시장 테마별 일정 자동생성</div>
+              </div>
+            </div>
+
+            <div onclick="switchMenu('booking')" class="cursor-pointer bg-white/10 hover:bg-white/15 p-4 rounded-2xl border border-white/10 flex items-center gap-3.5">
+              <div class="w-10 h-10 rounded-xl bg-emerald-500 text-white font-black text-base flex items-center justify-center shrink-0">3</div>
+              <div>
+                <div class="font-black text-sm text-white">BASIC / PREMIUM 예약</div>
+                <div class="text-xs text-cream/75">단체버스(다대일 인솔) vs 전용차량(전담 가이드)</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- STEP 1: 내가 좋아하는 트롯 가수 선택 (선택 즉시 예약 탭으로 이동 가능) -->
-      <div class="toss-card p-6 space-y-4 border-2 border-navy">
+      <!-- STEP 1: 내가 좋아하는 트롯 가수 선택 (누르면 바로 2번 예약 탭으로 연결!) -->
+      <div id="home-singer-box" class="toss-card p-6 space-y-4 border-2 border-navy">
         <div class="flex flex-wrap justify-between items-center gap-2">
           <div>
-            <span class="text-xs font-extrabold text-coral">가장 먼저 가수를 골라보세요</span>
-            <h2 class="text-xl font-black text-navy s-h2">어떤 가수의 콘서트에 가시나요?</h2>
+            <span class="text-xs font-extrabold text-coral">1단계 · 내 가수 터치</span>
+            <h2 class="text-xl font-black text-navy s-h2">어떤 가수의 콘서트에 가시나요? (누르면 코스·예약 화면으로 이동)</h2>
           </div>
-          <button onclick="switchMenu('booking')" class="text-xs font-black text-coral underline">코스 설계 & 예약 화면으로 ➔</button>
         </div>
 
         <div id="home-singer-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2.5"></div>
 
-        <!-- 가수 직접 입력 -->
+        <!-- 다른 가수 직접 입력 -->
         <div class="bg-cream-light p-3 rounded-2xl flex flex-wrap sm:flex-nowrap items-center gap-2 border border-cream-border">
           <span class="text-xs font-black text-navy shrink-0">➕ 다른 가수 직접 입력:</span>
           <input id="custom-singer-input" type="text" placeholder="예: 진성, 김연자, 박서진" class="flex-1 p-2.5 rounded-xl bg-white border border-cream-border text-xs font-bold text-navy" />
@@ -209,39 +209,35 @@
             <option value="안동">안동 공연</option>
           </select>
           <button onclick="applyCustomSinger()" class="toss-btn px-4 py-2.5 rounded-xl bg-navy text-white font-black text-xs shrink-0">
-            설정하기
+            설정 후 코스 보기 ➔
           </button>
         </div>
       </div>
 
-      <!-- 4대 메뉴 요약 가이드 카드 -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div onclick="switchMenu('booking')" class="cursor-pointer toss-card toss-hover p-5 border-2 border-coral space-y-2">
-          <div class="toss-icon-box bg-coral-light text-2xl">🪄</div>
-          <span class="text-[11px] font-black text-coral">여기서 예약하세요!</span>
-          <h3 class="font-black text-base text-navy">2. 맞춤 코스 & 예약</h3>
-          <p class="text-xs text-gray-500 font-bold">공연여행 + AI 코스 설계 + 지역관광 지도 + 원스톱 예약</p>
+      <!-- 두 가지 핵심 이용 방식 비교 (개인/가족 맞춤예약 vs 팬클럽 총무/회원) -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div onclick="switchMenu('booking')" class="cursor-pointer toss-card toss-hover p-6 border-2 border-coral flex items-center justify-between">
+          <div class="flex items-center gap-4">
+            <div class="toss-icon-box bg-coral-light text-2xl">🪄</div>
+            <div>
+              <span class="text-xs font-black text-coral">개인 · 친구 · 가족 관람객</span>
+              <h3 class="text-lg font-black text-navy">2. 맞춤 코스 & 통합예약 탭으로 가기</h3>
+              <p class="text-xs font-bold text-gray-500 mt-0.5">AI 일정 설계 + 관광 지도 + 로컬 가이드 + BASIC/PREMIUM 예약</p>
+            </div>
+          </div>
+          <i class="fa-solid fa-chevron-right text-coral text-lg"></i>
         </div>
 
-        <div onclick="switchMenu('package')" class="cursor-pointer toss-card toss-hover p-5 space-y-2">
-          <div class="toss-icon-box bg-cream text-2xl">🧑‍✈️</div>
-          <span class="text-[11px] font-black text-navy">상세 안내</span>
-          <h3 class="font-black text-base text-navy">3. 상품 & 로컬가이드</h3>
-          <p class="text-xs text-gray-500 font-bold">BASIC/PREMIUM 비교 및 동행할 청년 로컬 가이드 프로필</p>
-        </div>
-
-        <div onclick="switchMenu('fanclub')" class="cursor-pointer toss-card toss-hover p-5 space-y-2">
-          <div class="toss-icon-box bg-navy text-white text-2xl">🚩</div>
-          <span class="text-[11px] font-black text-coral">총무 · 일반회원</span>
-          <h3 class="font-black text-base text-navy">4. 팬클럽 단체 여행</h3>
-          <p class="text-xs text-gray-500 font-bold">총무 단체방 개설·관리 및 일반 회원 초대코드 신청·QR 확인</p>
-        </div>
-
-        <div onclick="switchMenu('gov')" class="cursor-pointer toss-card toss-hover p-5 space-y-2">
-          <div class="toss-icon-box bg-emerald-50 text-2xl">🏛️</div>
-          <span class="text-[11px] font-black text-emerald-700">B2G 브리핑</span>
-          <h3 class="font-black text-base text-navy">5. 지자체 협업</h3>
-          <p class="text-xs text-gray-500 font-bold">관광객 유입 · 숙박 전환 · 소상공인 매출 시뮬레이션</p>
+        <div onclick="switchMenu('fanclub')" class="cursor-pointer toss-card toss-hover p-6 border-2 border-navy flex items-center justify-between">
+          <div class="flex items-center gap-4">
+            <div class="toss-icon-box bg-navy text-white text-2xl">🚩</div>
+            <div>
+              <span class="text-xs font-black text-navy">팬클럽 지부 총무 · 일반 회원</span>
+              <h3 class="text-lg font-black text-navy">3. 팬클럽 단체 여행 탭으로 가기</h3>
+              <p class="text-xs font-bold text-gray-500 mt-0.5">총무 단체방 개설·입금관리 및 회원 초대코드 참여·QR 탑승권</p>
+            </div>
+          </div>
+          <i class="fa-solid fa-chevron-right text-navy text-lg"></i>
         </div>
       </div>
 
@@ -249,32 +245,31 @@
 
 
     <!-- =========================================================================
-         [탭 2 (통합 원스톱 허브!): 맞춤 코스 & 예약 = 공연여행 + AI 플래너 + 지역관광 지도 + 통합예약]
+         [탭 2 (올인원 통합 탭!): 맞춤 코스 + 지역관광 지도 + 청년 로컬 가이드 + BASIC/PREMIUM 예약]
          ========================================================================= -->
     <section id="page-booking" class="space-y-6 hidden">
       
-      <!-- 안내 배너 -->
+      <!-- 올인원 안내 헤더 -->
       <div class="toss-card bg-navy text-white p-6 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
         <div class="flex items-center gap-3.5">
           <div class="toss-icon-box bg-coral text-white">🪄</div>
           <div>
-            <span class="text-xs font-bold text-amber-300">공연 여행 · AI 플래너 · 지역 관광 · 예약이 하나로 통합되었습니다</span>
-            <h2 class="text-xl md:text-2xl font-black s-h2">내 가수 맞춤 코스 설계 & 원스톱 예약</h2>
+            <span class="text-xs font-bold text-amber-300">다른 탭으로 이동할 필요 없이 이 화면에서 모든 예약이 완료됩니다</span>
+            <h2 class="text-xl md:text-2xl font-black s-h2">맞춤 코스 · 로컬 가이드 · 원스톱 예약</h2>
           </div>
         </div>
-        <span class="bg-white/15 text-amber-300 text-xs font-black px-3.5 py-2 rounded-xl shrink-0">
-          STEP 1 ➔ STEP 2 ➔ STEP 3 순서대로 선택 후 바로 예약!
-        </span>
+        <button onclick="document.getElementById('step3-booking-section').scrollIntoView({behavior:'smooth'})" class="toss-btn px-4 py-2.5 rounded-xl bg-amber-400 text-navy font-black text-xs shrink-0">
+          👇 맨 아래 예약창 바로가기
+        </button>
       </div>
 
-      <!-- [STEP 1] 내 가수 선택 & 체류 기간 (당일 / 1박 2일 / 2박 3일) 선택 -->
-      <div class="toss-card p-6 space-y-5">
+      <!-- [STEP 1] 가수 & 여행 기간 (당일 / 1박 2일 / 2박 3일) 선택 -->
+      <div class="toss-card p-6 space-y-4">
         <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 border-b border-cream-border pb-4">
           <div>
-            <span class="text-xs font-extrabold text-coral">STEP 1 · 공연 및 기간 선택</span>
-            <h3 class="text-lg font-black text-navy s-h2">보러 갈 가수와 여행 기간(당일~2박3일)을 선택하세요</h3>
+            <span class="text-xs font-extrabold text-coral">STEP 1 · 가수 및 여행 기간</span>
+            <h3 class="text-lg font-black text-navy s-h2">보러 갈 가수와 체류 기간(당일 · 1박 2일 · 2박 3일)을 선택하세요</h3>
           </div>
-          <!-- 당일 / 1박 2일 / 2박 3일 버튼 -->
           <div class="bg-cream p-1.5 rounded-2xl inline-flex gap-1 shrink-0">
             <button onclick="setUnifiedDuration('당일형')" id="u-dur-당일형" class="px-4 py-2 rounded-xl font-bold text-xs text-navy">☀️ 당일형</button>
             <button onclick="setUnifiedDuration('1박 2일')" id="u-dur-1박 2일" class="px-4 py-2 rounded-xl font-black text-xs bg-navy text-white shadow-xs">🌙 1박 2일</button>
@@ -285,18 +280,15 @@
         <div id="booking-singer-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2.5"></div>
       </div>
 
-      <!-- [STEP 2] AI 코스 테마 선택 + 실시간 변경되는 일정표 + 지역 관광 지도 상세보기 -->
+      <!-- [STEP 2] AI 코스 테마 선택 & 실시간 변경 일정표 & 지역 관광 지도 -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        
-        <!-- 좌측(5칸): AI 테마 선택 -->
-        <div class="lg:col-span-5 toss-card p-6 space-y-4">
+        <div class="lg:col-span-5 toss-card p-6 space-y-3.5">
           <div>
-            <span class="text-xs font-extrabold text-coral">STEP 2 · AI 테마 선택</span>
-            <h3 class="text-lg font-black text-navy">원하는 여행 테마를 눌러보세요</h3>
-            <p class="text-xs font-bold text-gray-400 mt-0.5">누르는 즉시 오른쪽 일정표와 관광 코스가 완전히 바뀝니다!</p>
+            <span class="text-xs font-extrabold text-coral">STEP 2 · AI 코스 테마 선택</span>
+            <h3 class="text-lg font-black text-navy">원하는 테마를 누르면 일정이 바뀝니다</h3>
           </div>
 
-          <div class="space-y-2.5">
+          <div class="space-y-2">
             <button onclick="setAiTheme('senior')" id="aitheme-senior" class="w-full p-3.5 rounded-2xl border-2 border-coral bg-coral-light text-left flex items-center gap-3">
               <span class="text-2xl">🌿</span>
               <div>
@@ -331,25 +323,25 @@
           </div>
         </div>
 
-        <!-- 우측(7칸): 실시간 변경되는 AI 일정표 -->
+        <!-- 실시간 변경되는 일정표 -->
         <div id="ai-result-panel" class="lg:col-span-7 toss-card p-6 space-y-4 border-2 border-navy flex flex-col justify-between"></div>
       </div>
 
-      <!-- [통합된 지역 관광 & 지도 섹션] 코스 내 포함 장소 지도 및 상세 정보 -->
+      <!-- 코스에 포함된 지역 관광지 & 맛집 지도 -->
       <div class="toss-card p-6 space-y-4">
         <div class="flex flex-wrap justify-between items-center gap-2">
           <div class="flex items-center gap-3">
             <div class="toss-icon-box bg-cream text-xl">🗺️</div>
             <div>
-              <span class="text-xs font-extrabold text-coral">코스에 포함된 지역 관광지 · 맛집 · 숙박 상세</span>
-              <h3 id="embedded-map-title" class="text-lg font-black text-navy">공연장 주변 핵심 관광 지도 (마커 클릭)</h3>
+              <span class="text-xs font-extrabold text-coral">지역 관광 지도 연동</span>
+              <h3 id="embedded-map-title" class="text-lg font-black text-navy">공연장 주변 핵심 관광지 · 맛집 · 숙박 위치</h3>
             </div>
           </div>
           <div id="local-cat-tabs" class="flex flex-wrap gap-1.5"></div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
-          <div class="lg:col-span-2 relative h-72 rounded-2xl bg-[#E8DFCE] border-2 border-navy/15 overflow-hidden flex items-center justify-center">
+          <div class="lg:col-span-2 relative h-64 rounded-2xl bg-[#E8DFCE] border-2 border-navy/15 overflow-hidden flex items-center justify-center">
             <div class="absolute inset-0 opacity-25" style="background-image: radial-gradient(#24364B 1.5px, transparent 1.5px); background-size: 20px 20px;"></div>
             <div class="absolute top-1/2 left-0 right-0 h-3 bg-white/80 rotate-3"></div>
             <div class="absolute top-0 bottom-0 left-1/2 w-3 bg-white/80 -rotate-6"></div>
@@ -363,191 +355,136 @@
         </div>
       </div>
 
-      <!-- 🔥 [STEP 3: 유일하고 확실한 원스톱 예약 확정 박스!] -->
-      <div id="unified-checkout-box" class="toss-card p-6 md:p-8 border-2 border-coral bg-white space-y-5">
-        <div class="flex flex-wrap justify-between items-center gap-2 border-b border-cream-border pb-4">
-          <div>
-            <span class="bg-coral text-white text-xs font-black px-3 py-1 rounded-full">STEP 3 · 최종 상품 선택 및 원스톱 예약</span>
-            <h3 class="text-xl font-black text-navy mt-1.5 s-h2">위에서 설계한 코스를 어떤 방식으로 예약하시겠어요?</h3>
-          </div>
-          <button onclick="switchMenu('package')" class="text-xs font-extrabold text-navy underline">
-            BASIC·PREMIUM 및 로컬 가이드 상세 비교 보기 ➔
-          </button>
+      <!-- 🔥 [STEP 3: 로컬 가이드 확인 + BASIC(다대일 인솔·대량인원) vs PREMIUM(전담 가이드) 올인원 예약!] -->
+      <div id="step3-booking-section" class="toss-card p-6 md:p-8 border-2 border-coral bg-white space-y-6">
+        
+        <div class="border-b border-cream-border pb-4">
+          <span class="bg-coral text-white text-xs font-black px-3 py-1 rounded-full">STEP 3 · 로컬 가이드 배정 방식 선택 & 즉시 예약</span>
+          <h3 class="text-xl font-black text-navy mt-2 s-h2">단체 투어(BASIC)와 소규모 전담 투어(PREMIUM) 중 선택하세요</h3>
+          <p class="text-xs font-bold text-gray-500 mt-0.5">선택하시는 상품에 따라 배정되는 청년 로컬 가이드의 역할과 선택 가능한 참여 인원수가 자동으로 바뀝니다.</p>
         </div>
 
-        <!-- BASIC vs PREMIUM 원클릭 선택 카드 -->
+        <!-- 1) BASIC(다대일 인솔 가이드) vs PREMIUM(전담 로컬 가이드) 선택 카드 -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div onclick="selectCheckoutTier('BASIC')" id="chk-tier-BASIC" class="cursor-pointer p-5 rounded-2xl border-2 border-cream-border bg-cream-light flex justify-between items-center transition">
-            <div class="flex items-center gap-3.5">
-              <div class="toss-icon-box bg-navy text-white">🚌</div>
-              <div>
-                <span class="text-xs font-extrabold text-navy">20~40명 단체형 관광버스</span>
-                <h4 class="font-black text-base text-navy">BASIC 단체 투어로 가기</h4>
-                <p class="text-[11px] font-bold text-gray-500">왕복 전용버스 + 제휴 맛집 + 지역 관광</p>
+          
+          <!-- BASIC 카드: 다대일(1:N) 인원확인 및 단체 인솔 가이드 명시 -->
+          <div onclick="selectCheckoutTier('BASIC')" id="chk-tier-BASIC" class="cursor-pointer p-5 rounded-3xl border-2 border-navy bg-cream flex flex-col justify-between space-y-4 transition shadow-sm">
+            <div class="space-y-3">
+              <div class="flex justify-between items-start">
+                <div class="flex items-center gap-3">
+                  <div class="toss-icon-box bg-navy text-white">🚌</div>
+                  <div>
+                    <span class="bg-navy text-amber-300 text-[11px] font-black px-2.5 py-0.5 rounded-full">BASIC · 단체 투어 (1~40명 선택 가능)</span>
+                    <h4 class="font-black text-lg text-navy mt-1">함께 가는 단체버스 투어</h4>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <span class="text-[11px] font-bold text-gray-500 block">1인 기준</span>
+                  <span id="chk-basic-price" class="text-xl font-black text-navy">139,000원</span>
+                </div>
+              </div>
+
+              <!-- 다대일 인솔 가이드 역할 명시 박스 -->
+              <div class="bg-white p-3.5 rounded-2xl border border-cream-border space-y-1 text-xs">
+                <div class="font-black text-navy flex items-center gap-1.5">
+                  <span>📋 담당 로컬 가이드:</span>
+                  <span class="text-coral">다대일(1:N) 단체 인솔 가이드 1명 배정</span>
+                </div>
+                <p class="text-gray-600 font-bold leading-relaxed">
+                  • 버스 탑승 시 <strong>출석·인원 확인</strong>, 예약 식당 단체석 배정 안내, 공연 종료 후 <strong>귀가 버스 집결 인원 점검</strong>을 전담합니다.
+                </p>
               </div>
             </div>
-            <div class="text-right shrink-0">
-              <span class="text-[11px] font-bold text-gray-400 block">1인 제안가</span>
-              <span id="chk-basic-price" class="text-lg font-black text-navy">139,000원</span>
+
+            <div class="text-xs font-black text-navy text-center py-2 rounded-xl bg-white border border-navy/20">
+              ✔ 혼자(1명)부터 친구·모임·단체(최대 40명)까지 대량 신청 가능
             </div>
           </div>
 
-          <div onclick="selectCheckoutTier('PREMIUM')" id="chk-tier-PREMIUM" class="cursor-pointer p-5 rounded-2xl border-2 border-coral bg-coral-light/60 flex justify-between items-center transition shadow-xs">
-            <div class="flex items-center gap-3.5">
-              <div class="toss-icon-box bg-coral text-white">👑</div>
-              <div>
-                <span class="text-xs font-extrabold text-coral">4~6인 전용차량 + 청년 로컬 가이드 전담</span>
-                <h4 class="font-black text-base text-navy">PREMIUM 맞춤 동행으로 가기</h4>
-                <p class="text-[11px] font-bold text-gray-600">전담 로컬 가이드 + 전용차량 + 특식 + 사진기록</p>
+          <!-- PREMIUM 카드: 우리 팀만의 전담 로컬 가이드 명시 -->
+          <div onclick="selectCheckoutTier('PREMIUM')" id="chk-tier-PREMIUM" class="cursor-pointer p-5 rounded-3xl border-2 border-cream-border bg-cream-light flex flex-col justify-between space-y-4 transition opacity-80">
+            <div class="space-y-3">
+              <div class="flex justify-between items-start">
+                <div class="flex items-center gap-3">
+                  <div class="toss-icon-box bg-coral text-white">👑</div>
+                  <div>
+                    <span class="bg-coral text-white text-[11px] font-black px-2.5 py-0.5 rounded-full">PREMIUM · 프라이빗 (1~6명 전용)</span>
+                    <h4 class="font-black text-lg text-navy mt-1">우리 팀 전용차량 & 전담 가이드</h4>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <span class="text-[11px] font-bold text-coral block">1인 기준</span>
+                  <span id="chk-prem-price" class="text-xl font-black text-coral">259,000원</span>
+                </div>
+              </div>
+
+              <!-- 전담 로컬 가이드 역할 명시 박스 -->
+              <div class="bg-white p-3.5 rounded-2xl border border-coral/30 space-y-1 text-xs">
+                <div class="font-black text-navy flex items-center gap-1.5">
+                  <span>🧑‍✈️ 담당 로컬 가이드:</span>
+                  <span class="text-coral">우리 팀(1~6명) 전담 청년 로컬 가이드 동행</span>
+                </div>
+                <p class="text-gray-600 font-bold leading-relaxed">
+                  • 전용 밴 차량 픽업부터 <strong>지역 명소 1:1 스토리텔링 해설, 스냅 사진 촬영, 공연장 좌석 착석 에스코트</strong>까지 전 일정 밀착 케어합니다.
+                </p>
               </div>
             </div>
-            <div class="text-right shrink-0">
-              <span class="text-[11px] font-bold text-coral block">1인 제안가</span>
-              <span id="chk-prem-price" class="text-lg font-black text-coral">259,000원</span>
+
+            <div class="text-xs font-black text-coral text-center py-2 rounded-xl bg-white border border-coral/30">
+              ✔ 부모님 효도 선물 · 가족/단짝 소규모 맞춤 동행
             </div>
           </div>
+
         </div>
 
-        <!-- 신청자 정보 입력 및 최종 예약 버튼 -->
+        <!-- 2) 이 탭 안에서 바로 확인하는 지역별 청년 로컬 가이드 프로필 (클릭 시 상세 모달) -->
+        <div class="bg-cream-light p-5 rounded-3xl border border-cream-border space-y-3">
+          <div class="flex flex-wrap justify-between items-center gap-2">
+            <div>
+              <span class="text-xs font-extrabold text-emerald-800">지역 청년 일자리 상생 파트너</span>
+              <h4 class="text-base font-black text-navy">🧑‍✈️ 함께할 지역별 청년 로컬 가이드 (카드를 누르면 검증 이력 상세보기)</h4>
+            </div>
+            <span id="guide-mode-pill" class="bg-navy text-amber-300 text-xs font-black px-3 py-1 rounded-full">
+              현재 BASIC 선택됨: 다대일(1:N) 인원확인·인솔 가이드로 배정됩니다
+            </span>
+          </div>
+
+          <div id="guide-list-grid" class="grid grid-cols-1 md:grid-cols-3 gap-3"></div>
+        </div>
+
+        <!-- 3) 참여 인원 선택 (BASIC은 1명~40명 대량 선택 가능!) & 예약자 입력 -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2">
-          <div class="bg-cream-light p-3 rounded-2xl border border-cream-border flex items-center justify-between">
-            <span class="text-xs font-black text-navy pl-1">참여 인원</span>
-            <select id="chk-pax" onchange="updateCheckoutSummary()" class="bg-white px-3 py-1.5 rounded-xl font-black text-xs text-navy border">
-              <option value="1">1명</option>
-              <option value="2" selected>2명 (부부·단짝)</option>
-              <option value="4">4명 (가족 한 팀)</option>
-              <option value="6">6명 (소모임)</option>
+          <div class="bg-cream p-3.5 rounded-2xl border-2 border-navy flex items-center justify-between">
+            <span id="pax-label-title" class="text-xs font-black text-navy pl-1">참여 인원 (단체 가능)</span>
+            <select id="chk-pax" onchange="updateCheckoutSummary()" class="bg-white px-3 py-2 rounded-xl font-black text-xs text-coral border border-cream-border">
+              <!-- JS에서 BASIC(1~40명) / PREMIUM(1~6명)에 맞춰 동적 렌더링 -->
             </select>
           </div>
           <input id="chk-name" type="text" value="김영숙" placeholder="예약자 성함" class="p-3.5 rounded-2xl bg-cream-light border border-cream-border font-black text-xs text-navy" />
           <input id="chk-phone" type="tel" value="010-1234-5678" placeholder="연락처 (자동 마스킹 보호)" class="p-3.5 rounded-2xl bg-cream-light border border-cream-border font-black text-xs text-navy" />
         </div>
 
-        <div class="bg-navy text-white p-5 rounded-3xl flex flex-col sm:flex-row justify-between items-center gap-4">
-          <div>
+        <!-- 4) 최종 원스톱 예약 완료 바 -->
+        <div class="bg-navy text-white p-6 rounded-3xl flex flex-col sm:flex-row justify-between items-center gap-4 shadow-lg">
+          <div class="space-y-1">
             <span id="chk-final-summary" class="text-xs font-bold text-amber-300 block">선택 요약</span>
-            <span id="chk-final-total" class="text-2xl font-black text-white">총 518,000원</span>
-            <span class="text-xs text-gray-300 ml-1">(시연용 가예약 · 공연 티켓 별도)</span>
+            <div class="flex items-baseline gap-2">
+              <span id="chk-final-total" class="text-2xl md:text-3xl font-black text-white">총 278,000원</span>
+              <span class="text-xs text-gray-300">(시연용 가예약 · 공연 티켓 별도)</span>
+            </div>
           </div>
-          <button onclick="submitUnifiedBooking()" class="toss-btn w-full sm:w-auto px-8 py-4 rounded-2xl bg-coral text-white font-black text-base shadow-lg">
-            ✅ 이 코스로 최종 예약 완료하기
+          <button onclick="submitUnifiedBooking()" class="toss-btn w-full sm:w-auto px-8 py-4 rounded-2xl bg-coral hover:bg-coral-dark text-white font-black text-base shadow-lg">
+            ✅ 이 조건으로 예약 완료하기
           </button>
         </div>
+
       </div>
 
     </section>
 
 
     <!-- =========================================================================
-         [탭 3 (통합 쇼케이스!): 상품 & 로컬 가이드 = BASIC/PREMIUM 비교 + 청년 로컬 가이드 상세보기]
-         ========================================================================= -->
-    <section id="page-package" class="space-y-7 hidden">
-      
-      <!-- 1. BASIC vs PREMIUM 상품 비교 -->
-      <div class="toss-card p-6 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
-        <div>
-          <span class="text-xs font-extrabold text-coral">투트랙(Two-Track) 상품 & 로컬 가이드 소개</span>
-          <h2 class="text-2xl font-black text-navy s-h2">BASIC 단체형 vs PREMIUM 로컬 가이드 동행</h2>
-          <p class="text-xs font-bold text-gray-500 mt-0.5">상품 구성을 확인하시고, 아래에서 동행할 청년 로컬 가이드의 상세 프로필을 펼쳐보세요.</p>
-        </div>
-        <div class="bg-cream p-1.5 rounded-2xl inline-flex gap-1 shrink-0">
-          <button onclick="setProductDuration('당일형')" id="prod-dur-당일형" class="px-4 py-2 rounded-xl font-bold text-xs text-navy">☀️ 당일형</button>
-          <button onclick="setProductDuration('1박 2일')" id="prod-dur-1박 2일" class="px-4 py-2 rounded-xl font-black text-xs bg-navy text-white">🌙 1박 2일</button>
-          <button onclick="setProductDuration('2박 3일')" id="prod-dur-2박 3일" class="px-4 py-2 rounded-xl font-bold text-xs text-navy">⛰️ 2박 3일</button>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- BASIC 카드 -->
-        <div class="toss-card p-7 border-2 border-navy flex flex-col justify-between space-y-5">
-          <div class="space-y-4">
-            <div class="flex justify-between items-start">
-              <div class="flex items-center gap-3.5">
-                <div class="toss-icon-box bg-navy text-white">🚌</div>
-                <div>
-                  <span class="bg-navy text-white text-[11px] font-black px-2.5 py-0.5 rounded-full">BASIC · 20~40명 단체</span>
-                  <h3 class="text-xl font-black text-navy mt-1">함께 떠나는 알찬 단체 투어</h3>
-                </div>
-              </div>
-              <div class="text-right">
-                <span id="basic-dur-label" class="text-xs font-bold text-gray-400 block">1박 2일 (1인)</span>
-                <span id="basic-price-display" class="text-2xl font-black text-navy">139,000원</span>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-3 gap-2 text-center">
-              <div class="p-3 rounded-2xl bg-cream-light"><div class="text-2xl mb-1">🚌</div><div class="font-black text-xs text-navy">전용 관광버스</div></div>
-              <div class="p-3 rounded-2xl bg-cream-light"><div class="text-2xl mb-1">🍲</div><div class="font-black text-xs text-navy">제휴 맛집·시장</div></div>
-              <div class="p-3 rounded-2xl bg-cream-light"><div class="text-2xl mb-1">🏨</div><div class="font-black text-xs text-navy">체류형 숙박</div></div>
-            </div>
-
-            <div class="p-3.5 rounded-2xl bg-emerald-50 text-xs font-bold text-emerald-950 space-y-1">
-              <div class="font-black text-emerald-700">✔ 포함 범위 (티켓 별도)</div>
-              <div id="basic-inc-text">• 전용버스 + 호텔 1박(조식) + 식사 3회 + 시장투어</div>
-            </div>
-          </div>
-
-          <button onclick="goToUnifiedBooking('BASIC')" class="toss-btn w-full py-4 rounded-2xl bg-navy text-white font-black text-sm">
-            BASIC 선택하고 코스·예약 탭으로 이동 ➔
-          </button>
-        </div>
-
-        <!-- PREMIUM 카드 (청년 로컬 가이드 직결!) -->
-        <div class="toss-card p-7 border-2 border-coral flex flex-col justify-between space-y-5">
-          <div class="space-y-4">
-            <div class="flex justify-between items-start">
-              <div class="flex items-center gap-3.5">
-                <div class="toss-icon-box bg-coral text-white">👑</div>
-                <div>
-                  <span class="bg-coral text-white text-[11px] font-black px-2.5 py-0.5 rounded-full">PREMIUM · 한 팀 4~6명</span>
-                  <h3 class="text-xl font-black text-navy mt-1">청년 로컬 가이드 전담 동행</h3>
-                </div>
-              </div>
-              <div class="text-right">
-                <span id="prem-dur-label" class="text-xs font-bold text-coral block">1박 2일 (1인)</span>
-                <span id="prem-price-display" class="text-2xl font-black text-coral">259,000원</span>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-3 gap-2 text-center">
-              <div class="p-3 rounded-2xl bg-coral-light/60"><div class="text-2xl mb-1">🧑‍✈️</div><div class="font-black text-xs text-navy">전담 로컬 가이드</div></div>
-              <div class="p-3 rounded-2xl bg-coral-light/60"><div class="text-2xl mb-1">🚘</div><div class="font-black text-xs text-navy">전용 밴 차량</div></div>
-              <div class="p-3 rounded-2xl bg-coral-light/60"><div class="text-2xl mb-1">📸</div><div class="font-black text-xs text-navy">스냅 사진 기록</div></div>
-            </div>
-
-            <div class="p-3.5 rounded-2xl bg-emerald-50 text-xs font-bold text-emerald-950 space-y-1">
-              <div class="font-black text-emerald-700">✔ 포함 범위 (티켓 별도)</div>
-              <div id="prem-inc-text">• 전용차량 2일 + 로컬가이드 + 4성급 호텔 1박 + 특식</div>
-            </div>
-          </div>
-
-          <button onclick="goToUnifiedBooking('PREMIUM')" class="toss-btn w-full py-4 rounded-2xl bg-coral text-white font-black text-sm">
-            PREMIUM 선택하고 코스·예약 탭으로 이동 ➔
-          </button>
-        </div>
-      </div>
-
-      <!-- 2. 함께 묶인 청년 로컬 가이드 프로필 & 상세보기 모달 연동 -->
-      <div class="toss-card p-6 md:p-8 space-y-5">
-        <div class="flex flex-wrap justify-between items-center gap-2">
-          <div class="flex items-center gap-3.5">
-            <div class="toss-icon-box bg-emerald-100 text-emerald-800">🧑‍✈️</div>
-            <div>
-              <span class="text-xs font-extrabold text-emerald-700">PREMIUM 투어를 완성하는 지역의 주역</span>
-              <h3 class="text-xl font-black text-navy s-h2">지역별 청년 로컬 가이드 (클릭하여 상세보기)</h3>
-            </div>
-          </div>
-          <span class="bg-amber-100 text-amber-900 text-xs font-black px-3 py-1 rounded-full">시연용 예시 프로필</span>
-        </div>
-
-        <div id="guide-list-grid" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
-      </div>
-
-    </section>
-
-
-    <!-- =========================================================================
-         [탭 4: 팬클럽 단체 여행 — 일반 회원 vs 회장·총무]
+         [탭 3: 팬클럽 단체 여행 — 일반 회원 vs 회장·총무]
          ========================================================================= -->
     <section id="page-fanclub" class="space-y-6 hidden">
       <div class="toss-card bg-navy text-white p-6 space-y-4">
@@ -597,6 +534,7 @@
                 <select id="mem-apply-pax" class="p-3.5 rounded-2xl bg-cream-light border border-cream-border font-bold text-navy">
                   <option value="1">1명 신청</option>
                   <option value="2">2명 신청</option>
+                  <option value="4">4명 신청</option>
                 </select>
               </div>
               <select id="mem-apply-seat-pref" class="w-full p-3.5 rounded-2xl bg-cream-light border border-cream-border font-bold text-navy">
@@ -662,7 +600,6 @@
                   <option value="☀️ [당일] 공연 + 맛집·전통시장 (49,000원)">☀️ [당일] 공연 + 맛집·전통시장 (49,000원)</option>
                   <option value="🌙 [1박 2일] 공연 + 숙박 + 전통시장 투어 (139,000원)">🌙 [1박 2일] 공연 + 숙박 + 전통시장 (139,000원)</option>
                   <option value="⛰️ [2박 3일] 공연 + 숙박 2박 + 지역 명소 일주 (229,000원)">⛰️ [2박 3일] 공연 + 숙박 2박 + 명소 일주 (229,000원)</option>
-                  <option value="🧑‍✈️ [특화] 청년 로컬 가이드 동행 단체 상품 (65,000원~)">🧑‍✈️ [특화] 청년 로컬 가이드 동행 상품 (65,000원~)</option>
                 </select>
               </div>
               <button onclick="createNewFanclubTour()" class="toss-btn w-full py-3.5 rounded-xl bg-coral text-white font-black text-xs">
@@ -676,7 +613,7 @@
 
 
     <!-- =========================================================================
-         [탭 5: 지자체 협업 대시보드]
+         [탭 4: 지자체 협업 대시보드]
          ========================================================================= -->
     <section id="page-gov" class="space-y-6 hidden">
       <div class="toss-card bg-navy text-white p-7 space-y-2">
@@ -710,14 +647,13 @@
 
   </main>
 
-  <!-- 모바일 하단 고정 5대 탭바 -->
+  <!-- 모바일 하단 고정 4대 탭바 -->
   <div class="fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur border-t border-cream-border z-30 md:hidden">
-    <div class="grid grid-cols-5 text-center py-2 text-[11px] font-bold text-gray-400">
-      <button onclick="switchMenu('home')" class="flex flex-col items-center gap-0.5 text-navy font-black"><i class="fa-solid fa-house"></i><span>홈</span></button>
-      <button onclick="switchMenu('booking')" class="flex flex-col items-center gap-0.5 text-coral font-black"><i class="fa-solid fa-wand-magic-sparkles"></i><span>코스·예약</span></button>
-      <button onclick="switchMenu('package')" class="flex flex-col items-center gap-0.5"><i class="fa-solid fa-user-check"></i><span>상품·가이드</span></button>
-      <button onclick="switchMenu('fanclub')" class="flex flex-col items-center gap-0.5"><i class="fa-solid fa-users"></i><span>팬클럽단체</span></button>
-      <button onclick="switchMenu('gov')" class="flex flex-col items-center gap-0.5"><i class="fa-solid fa-building-columns"></i><span>지자체</span></button>
+    <div class="grid grid-cols-4 text-center py-2 text-[11px] font-bold text-gray-400">
+      <button onclick="switchMenu('home')" class="flex flex-col items-center gap-0.5 text-navy font-black"><i class="fa-solid fa-house"></i><span>1.홈</span></button>
+      <button onclick="switchMenu('booking')" class="flex flex-col items-center gap-0.5 text-coral font-black"><i class="fa-solid fa-wand-magic-sparkles"></i><span>2.코스·예약</span></button>
+      <button onclick="switchMenu('fanclub')" class="flex flex-col items-center gap-0.5"><i class="fa-solid fa-users"></i><span>3.팬클럽단체</span></button>
+      <button onclick="switchMenu('gov')" class="flex flex-col items-center gap-0.5"><i class="fa-solid fa-building-columns"></i><span>4.지자체</span></button>
     </div>
   </div>
 
@@ -744,7 +680,7 @@
   <div id="toast-box" class="fixed top-20 left-1/2 -translate-x-1/2 w-[90%] max-w-md bg-navy text-white px-5 py-3.5 rounded-2xl shadow-2xl text-xs font-black text-center z-50 hidden"></div>
 
   <script>
-    // ================= 1. 트롯 가수 & 지역별×테마별 동적 코스 DB =================
+    // ================= 1. 데이터 정의 =================
     let SINGERS_DB = [
       { id: 's-chanwon', singer: '이찬원', region: '대구', emoji: '🌸', venue: '대구 엑스코 동관', date: '11.14(토) ~ 11.15(일)' },
       { id: 's-hero', singer: '임영웅', region: '부산', emoji: '🩵', venue: '부산 벡스코 제1전시장', date: '11.28(토) ~ 11.29(일)' },
@@ -757,7 +693,7 @@
     const REGION_THEME_DATA = {
       '대구': {
         senior: {
-          day1: ['🚄 11:30 동대구역 마중 & 무장애 차량 탑승', '🍲 12:10 70년 전통 국일따로국밥 (저염 사골국물·입식 좌석)', '🌳 14:00 달성 옥포 송해공원 백세교 평지 산책', '🎤 16:30 엑스코 2층 한산한 화장실 안내 후 착석'],
+          day1: ['🚄 11:30 동대구역 마중 집결', '🍲 12:10 70년 전통 국일따로국밥 (저염 사골국물·입식 좌석)', '🌳 14:00 달성 옥포 송해공원 백세교 평지 산책', '🎤 16:30 엑스코 2층 한산한 화장실 안내 후 착석'],
           day2: ['🏨 09:30 호텔 조식 후 퇴실', '🌿 11:00 대구 수목원 무장애 평지 산책', '🐓 12:30 약령시 한방 삼계탕 보양식 후 귀가'],
           day3: ['🚠 10:00 팔공산 케이블카 전망대 관람', '🍚 12:30 팔공산 산채 정식 중식 후 안전 귀가']
         },
@@ -862,15 +798,15 @@
     ];
 
     const GUIDES_DB = [
-      { id: 0, name: '김민지 청년 로컬 가이드', region: '대구 · 경북권', emoji: '👩‍✈️', spec: '시니어 안심 동행 · 약령시/서문시장 해설', verified: ['대구관광재단 로컬 가이드 과정 수료', '대한적십자사 응급처치(CPR) 이수'], course: '동대구역 마중 → 안지랑/약령시 → 엑스코 동행', review: '어르신 걸음 속도에 맞춰 안내하고 안 붐비는 화장실까지 챙겨주어 든든했습니다.' },
-      { id: 1, name: '박준영 청년 로컬 가이드', region: '부산 · 경남권', emoji: '🧑‍✈️', spec: '가족 전용차량 운행 · 원도심 스토리텔링', verified: ['부산 청년 로컬 가이드 양성 수료', '무사고 안전운전 및 가족 스냅 기록'], course: '부산역 픽업 → 해운대 갈비 → 영도 → 벡스코 동행', review: '바다 배경으로 부모님 스냅 사진도 정성껏 찍어주셔서 최고의 효도 여행이었습니다.' },
-      { id: 2, name: '정소연 청년 로컬 가이드', region: '전주 · 안동권', emoji: '👩‍🎓', spec: '한옥마을·전통공예 해설 및 미식 큐레이션', verified: ['전통문화유산 해설 기초과정 수료', '시니어 디지털 길안내 봉사 수료'], course: '기차역 마중 → 종가 미식 → 한지공방 → 공연장 동행', review: '공연 전 한지 부채도 만들고 전통 찻집에서 쉰 시간이 너무나 품격 있었습니다.' }
+      { id: 0, name: '김민지 청년 로컬 가이드', region: '대구 · 경북권', emoji: '👩‍✈️', basicRole: '[BASIC 다대일 인솔] 20~40인 단체 버스 탑승 인원 확인 및 식당·집결지 안내', premRole: '[PREMIUM 전담] 1~6인 전용차량 동행 · 약령시/근대골목 해설 · 사진 촬영', verified: ['대구관광재단 로컬 가이드 과정 수료', '대한적십자사 응급처치(CPR) 이수'], course: '동대구역 마중 → 안지랑/약령시 → 엑스코 동행', review: '어르신 걸음 속도에 맞춰 안내하고 안 붐비는 화장실까지 챙겨주어 든든했습니다.' },
+      { id: 1, name: '박준영 청년 로컬 가이드', region: '부산 · 경남권', emoji: '🧑‍✈️', basicRole: '[BASIC 다대일 인솔] 단체 출석·탑승 인원 점검 및 해운대 식당·벡스코 집결 인솔', premRole: '[PREMIUM 전담] 가족 전용차량 운행 · 영도/국제시장 스토리텔링 · 스냅 기록', verified: ['부산 청년 로컬 가이드 양성 수료', '무사고 안전운전 및 가족 스냅 기록'], course: '부산역 픽업 → 해운대 갈비 → 영도 → 벡스코 동행', review: '바다 배경으로 부모님 스냅 사진도 정성껏 찍어주셔서 최고의 효도 여행이었습니다.' },
+      { id: 2, name: '정소연 청년 로컬 가이드', region: '전주 · 안동권', emoji: '👩‍🎓', basicRole: '[BASIC 다대일 인솔] 단체 인원 확인 및 한옥마을·하회마을 단체 동선 인솔', premRole: '[PREMIUM 전담] 1~6인 한옥마을·전통공예 밀착 해설 및 종가 미식 에스코트', verified: ['전통문화유산 해설 기초과정 수료', '시니어 디지털 길안내 봉사 수료'], course: '기차역 마중 → 종가 미식 → 한지공방 → 공연장 동행', review: '공연 전 한지 부채도 만들고 전통 찻집에서 쉰 시간이 너무나 품격 있었습니다.' }
     ];
 
     const PROD_PRICES = {
-      '당일형': { basic: 49000, prem: 149000, basicInc: '• 전용버스 + 식사 1회 + 지역관광', premInc: '• 전용차량 + 로컬가이드 + 특식 1회 + 촬영' },
-      '1박 2일': { basic: 139000, prem: 259000, basicInc: '• 전용버스 + 호텔 1박(조식) + 식사 3회 + 시장투어', premInc: '• 전용차량 2일 + 로컬가이드 + 4성급 호텔 1박 + 특식' },
-      '2박 3일': { basic: 229000, prem: 369000, basicInc: '• 전용버스 3일 + 호텔 2박 + 식사 5회 + 명소일주', premInc: '• 전용차량 3일 + 로컬가이드 전담 + 호텔 2박 + 포토북' }
+      '당일형': { basic: 49000, prem: 149000 },
+      '1박 2일': { basic: 139000, prem: 259000 },
+      '2박 3일': { basic: 229000, prem: 369000 }
     };
 
     const INITIAL_CLUBS = [
@@ -886,58 +822,49 @@
       }
     ];
 
-    let fanclubDB = JSON.parse(localStorage.getItem('tt_v6_clubs')) || INITIAL_CLUBS;
+    let fanclubDB = JSON.parse(localStorage.getItem('tt_v7_clubs')) || INITIAL_CLUBS;
     let activeClubCode = fanclubDB[0].clubCode;
     let selectedMemId = fanclubDB[0].members[0].id;
 
     let selSingerId = 's-chanwon';
     let unifiedDuration = '1박 2일';
     let aiTheme = 'senior';
-    let checkoutTier = 'PREMIUM';
-    let prodDuration = '1박 2일';
+    let checkoutTier = 'BASIC'; // 기본값을 BASIC(단체 인솔·대량인원 가능)으로 설정
     let localCat = '전체';
     let selMapSpotId = 'dg-1';
     let isSeniorMode = false;
 
     let myReservations = [
-      { id: 'RES-2026', title: '[이찬원 대구 · 1박 2일 · PREMIUM] 부모님을 위한 편안한 효도 코스', name: '김영숙', phone: '010-****-5678', pax: '2명', total: '518,000원' }
+      { id: 'RES-2026', title: '[이찬원 대구 · 1박 2일 · BASIC 단체투어] 부모님을 위한 편안한 효도 코스', name: '김영숙', phone: '010-****-5678', pax: '10명 (모임단체)', total: '총 1,390,000원' }
     ];
 
     function getCurrentSinger() {
       return SINGERS_DB.find(s => s.id === selSingerId) || SINGERS_DB[0];
     }
     function saveClubs() {
-      localStorage.setItem('tt_v6_clubs', JSON.stringify(fanclubDB));
+      localStorage.setItem('tt_v7_clubs', JSON.stringify(fanclubDB));
     }
     function getClub() {
       return fanclubDB.find(c => c.clubCode === activeClubCode) || fanclubDB[0];
     }
 
-    // ================= 2. 5대 메뉴 전환 =================
-    const ALL_MENUS = ['home', 'booking', 'package', 'fanclub', 'gov'];
+    // ================= 2. 4대 메뉴 전환 =================
+    const ALL_MENUS = ['home', 'booking', 'fanclub', 'gov'];
     function switchMenu(key) {
       ALL_MENUS.forEach(m => {
         document.getElementById('page-' + m).classList.toggle('hidden', m !== key);
         const btn = document.getElementById('nav-' + m);
         if (btn) {
           if (m === key) {
-            btn.className = 'nav-btn toss-btn py-2.5 px-3 rounded-2xl font-extrabold text-xs sm:text-sm bg-navy text-white shadow-xs';
+            btn.className = 'nav-btn toss-btn py-2.5 px-2 rounded-2xl font-extrabold text-xs sm:text-sm bg-navy text-white shadow-xs';
           } else if (m === 'booking') {
-            btn.className = 'nav-btn toss-btn py-2.5 px-3 rounded-2xl font-extrabold text-xs sm:text-sm bg-coral text-white shadow-xs';
+            btn.className = 'nav-btn toss-btn py-2.5 px-2 rounded-2xl font-extrabold text-xs sm:text-sm bg-coral text-white shadow-xs';
           } else {
-            btn.className = 'nav-btn toss-btn py-2.5 px-3 rounded-2xl font-bold text-xs sm:text-sm bg-white text-navy border border-cream-border';
+            btn.className = 'nav-btn toss-btn py-2.5 px-2 rounded-2xl font-bold text-xs sm:text-sm bg-white text-navy border border-cream-border';
           }
         }
       });
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function goToUnifiedBooking(tier) {
-      checkoutTier = tier;
-      unifiedDuration = prodDuration;
-      switchMenu('booking');
-      renderUnifiedBookingPage();
-      document.getElementById('unified-checkout-box').scrollIntoView({ behavior: 'smooth' });
     }
 
     // ================= 3. 가수 선택 & 직접 입력 =================
@@ -966,10 +893,10 @@
     }
 
     function renderSingerGrids() {
-      const html = SINGERS_DB.map(s => {
+      const makeGrid = (goFlag) => SINGERS_DB.map(s => {
         const active = s.id === selSingerId;
         return `
-          <button onclick="selectSinger('${s.id}')" class="toss-btn p-3.5 rounded-2xl border-2 text-left transition flex items-center gap-2.5 ${active ? 'border-coral bg-coral-light shadow-xs' : 'border-transparent bg-cream-light hover:bg-white'}">
+          <button onclick="selectSinger('${s.id}', ${goFlag})" class="toss-btn p-3.5 rounded-2xl border-2 text-left transition flex items-center gap-2.5 ${active ? 'border-coral bg-coral-light shadow-xs' : 'border-transparent bg-cream-light hover:bg-white'}">
             <span class="text-2xl">${s.emoji}</span>
             <div class="min-w-0">
               <span class="text-[10px] font-extrabold text-coral block">${s.region} 공연</span>
@@ -978,11 +905,12 @@
           </button>
         `;
       }).join('');
-      document.getElementById('home-singer-grid').innerHTML = html;
-      document.getElementById('booking-singer-grid').innerHTML = html;
+
+      document.getElementById('home-singer-grid').innerHTML = makeGrid(true);
+      document.getElementById('booking-singer-grid').innerHTML = makeGrid(false);
     }
 
-    // ================= 4. [탭 2] 통합 맞춤 코스 & 지역관광 지도 & 원스톱 예약 렌더링 =================
+    // ================= 4. [탭 2] 올인원 코스 · 지도 · 로컬 가이드 · 예약 렌더링 =================
     const THEME_META = {
       senior: { name: '🌿 부모님을 위한 편안한 효도 코스', tip: '계단 없는 평지 산책로와 신발 안 벗는 입식 보양식, 2층 한산한 화장실 동선으로 설계했습니다.' },
       food: { name: '🍲 가수 단골 & 노포 맛집 도장깨기', tip: '공연 당일 긴 대기 줄 없이 사전 예약된 전용 테이블로 바로 안내합니다.' },
@@ -1021,7 +949,7 @@
       const course = regionData[aiTheme] || regionData.senior;
       const meta = THEME_META[aiTheme];
 
-      // 1) AI 일정표 렌더링
+      // 1) AI 일정표
       const dayCards = [];
       dayCards.push(`
         <div class="p-4 rounded-2xl bg-white border border-cream-border space-y-1.5">
@@ -1032,7 +960,7 @@
           <div class="space-y-1 text-sm font-bold text-navy pt-1">
             ${course.day1.map(st => `<div class="p-2 rounded-xl bg-cream-light">${st}</div>`).join('')}
             <div class="p-2 rounded-xl bg-coral-light text-coral font-black">
-              ${unifiedDuration === '당일형' ? '🚌 20:00 공연 종료 후 전용 차량/버스 탑승 및 안전 귀가' : `🏨 20:30 공연 종료 후 ${s.region} 제휴 숙소 체크인`}
+              ${unifiedDuration === '당일형' ? '🚌 20:00 공연 종료 후 인솔자 인원 확인 및 귀가 출발' : `🏨 20:30 공연 종료 후 ${s.region} 제휴 숙소 체크인`}
             </div>
           </div>
         </div>
@@ -1065,16 +993,16 @@
           <div class="border-b border-cream-border pb-3">
             <span class="bg-coral text-white text-[11px] font-black px-2.5 py-0.5 rounded-full">${s.emoji} ${s.singer} (${s.region}) · ${unifiedDuration}</span>
             <h3 class="text-xl font-black text-navy mt-1.5">${meta.name}</h3>
-            <p class="text-xs font-bold text-gray-500 mt-1">🧑‍✈️ ${meta.tip}</p>
+            <p class="text-xs font-bold text-gray-500 mt-1">💡 ${meta.tip}</p>
           </div>
           <div class="space-y-2.5">${dayCards.join('')}</div>
         </div>
-        <button onclick="document.getElementById('unified-checkout-box').scrollIntoView({behavior:'smooth'})" class="toss-btn w-full py-3.5 rounded-2xl bg-navy text-amber-300 font-black text-xs mt-3">
-          👇 아래 STEP 3에서 바로 예약 확정하기
+        <button onclick="document.getElementById('step3-booking-section').scrollIntoView({behavior:'smooth'})" class="toss-btn w-full py-3.5 rounded-2xl bg-navy text-amber-300 font-black text-xs mt-3">
+          👇 아래 STEP 3에서 로컬 가이드 확인 & 바로 예약하기
         </button>
       `;
 
-      // 2) 통합된 지역 관광 지도 렌더링
+      // 2) 지역 관광 지도
       document.getElementById('embedded-map-title').innerText = `${s.region} 공연장 주변 핵심 관광 지도 (마커 클릭 시 상세 표시)`;
       const cats = ['전체', '맛집', '전통시장', '관광지', '숙박시설'];
       document.getElementById('local-cat-tabs').innerHTML = cats.map(c => `
@@ -1113,18 +1041,74 @@
         </a>
       `;
 
-      // 3) STEP 3 원스톱 예약 금액 업데이트
-      updateCheckoutSummary();
+      // 3) STEP 3 로컬 가이드 카드 & 인원 옵션 렌더링
+      renderStep3GuidesAndPax();
     }
 
     function selectCheckoutTier(tier) {
       checkoutTier = tier;
-      document.getElementById('chk-tier-BASIC').className = tier === 'BASIC'
-        ? 'cursor-pointer p-5 rounded-2xl border-2 border-navy bg-cream flex justify-between items-center transition shadow-xs'
-        : 'cursor-pointer p-5 rounded-2xl border border-cream-border bg-cream-light flex justify-between items-center transition opacity-75';
-      document.getElementById('chk-tier-PREMIUM').className = tier === 'PREMIUM'
-        ? 'cursor-pointer p-5 rounded-2xl border-2 border-coral bg-coral-light/60 flex justify-between items-center transition shadow-xs'
-        : 'cursor-pointer p-5 rounded-2xl border border-cream-border bg-cream-light flex justify-between items-center transition opacity-75';
+      const isBasic = tier === 'BASIC';
+
+      document.getElementById('chk-tier-BASIC').className = isBasic
+        ? 'cursor-pointer p-5 rounded-3xl border-2 border-navy bg-cream flex flex-col justify-between space-y-4 transition shadow-md'
+        : 'cursor-pointer p-5 rounded-3xl border border-cream-border bg-cream-light flex flex-col justify-between space-y-4 transition opacity-75';
+
+      document.getElementById('chk-tier-PREMIUM').className = !isBasic
+        ? 'cursor-pointer p-5 rounded-3xl border-2 border-coral bg-coral-light/60 flex flex-col justify-between space-y-4 transition shadow-md'
+        : 'cursor-pointer p-5 rounded-3xl border border-cream-border bg-cream-light flex flex-col justify-between space-y-4 transition opacity-75';
+
+      document.getElementById('guide-mode-pill').className = isBasic
+        ? 'bg-navy text-amber-300 text-xs font-black px-3 py-1 rounded-full'
+        : 'bg-coral text-white text-xs font-black px-3 py-1 rounded-full';
+      document.getElementById('guide-mode-pill').innerText = isBasic
+        ? '현재 BASIC 선택됨: 다대일(1:N) 인원확인·단체인솔 가이드로 배정됩니다'
+        : '현재 PREMIUM 선택됨: 우리 팀(1~6명) 1:1 전담 로컬 가이드로 배정됩니다';
+
+      renderStep3GuidesAndPax();
+    }
+
+    function renderStep3GuidesAndPax() {
+      const isBasic = checkoutTier === 'BASIC';
+
+      // 로컬 가이드 리스트 (BASIC일 때는 다대일 인솔 역할 강조, PREMIUM일 때는 전담 역할 강조)
+      document.getElementById('guide-list-grid').innerHTML = GUIDES_DB.map(g => `
+        <div onclick="openGuideDetailModal(${g.id})" class="cursor-pointer bg-white p-4 rounded-2xl border border-cream-border hover:border-coral transition space-y-2">
+          <div class="flex items-center gap-3">
+            <div class="w-11 h-11 rounded-xl bg-cream flex items-center justify-center text-xl">${g.emoji}</div>
+            <div>
+              <span class="text-[11px] font-extrabold text-coral">${g.region}</span>
+              <h5 class="text-sm font-black text-navy">${g.name}</h5>
+            </div>
+          </div>
+          <p class="text-xs font-bold text-navy bg-cream-light p-2.5 rounded-xl">
+            ${isBasic ? g.basicRole : g.premRole}
+          </p>
+          <span class="text-[11px] font-extrabold text-emerald-700 block text-right">프로필·검증이력 상세보기 ➔</span>
+        </div>
+      `).join('');
+
+      // 인원 선택 옵션 (BASIC은 1명~40명 대량 선택 가능, PREMIUM은 1~6명 소규모)
+      const paxSel = document.getElementById('chk-pax');
+      const prevVal = parseInt(paxSel.value || '2', 10);
+      document.getElementById('pax-label-title').innerText = isBasic ? '참여 인원 (최대 40명 단체 가능)' : '참여 인원 (1~6명 전용차량)';
+
+      if (isBasic) {
+        const basicOptions = [1, 2, 3, 4, 5, 6, 8, 10, 15, 20, 25, 30, 35, 40];
+        paxSel.innerHTML = basicOptions.map(n => `
+          <option value="${n}" ${n === prevVal ? 'selected' : ''}>
+            ${n}명 ${n >= 10 ? '(단체 모임)' : n === 1 ? '(혼자)' : ''}
+          </option>
+        `).join('');
+      } else {
+        const premOptions = [1, 2, 3, 4, 5, 6];
+        const safeVal = prevVal > 6 ? 4 : prevVal;
+        paxSel.innerHTML = premOptions.map(n => `
+          <option value="${n}" ${n === safeVal ? 'selected' : ''}>
+            ${n}명 (전담 가이드·전용차량)
+          </option>
+        `).join('');
+      }
+
       updateCheckoutSummary();
     }
 
@@ -1139,8 +1123,9 @@
       const unit = checkoutTier === 'BASIC' ? pObj.basic : pObj.prem;
       const total = (unit * pax).toLocaleString() + '원';
       const meta = THEME_META[aiTheme];
+      const tierDesc = checkoutTier === 'BASIC' ? 'BASIC 단체투어(다대일 인솔가이드)' : 'PREMIUM 맞춤투어(전담 로컬가이드)';
 
-      document.getElementById('chk-final-summary').innerText = `[${s.singer} ${s.region} · ${unifiedDuration} · ${checkoutTier}] ${meta.name} (${pax}명)`;
+      document.getElementById('chk-final-summary').innerText = `[${s.singer} ${s.region} · ${unifiedDuration}] ${tierDesc} · ${pax}명`;
       document.getElementById('chk-final-total').innerText = `총 ${total}`;
     }
 
@@ -1150,10 +1135,11 @@
       const pax = document.getElementById('chk-pax').value + '명';
       const name = document.getElementById('chk-name').value || '김영숙';
       const total = document.getElementById('chk-final-total').innerText;
+      const tierDesc = checkoutTier === 'BASIC' ? 'BASIC 단체투어(다대일 인솔)' : 'PREMIUM 전담동행';
 
       myReservations.unshift({
         id: 'RES-' + Math.floor(1000 + Math.random() * 9000),
-        title: `[${s.singer} ${s.region} · ${unifiedDuration} · ${checkoutTier}] ${meta.name}`,
+        title: `[${s.singer} ${s.region} · ${unifiedDuration} · ${tierDesc}] ${meta.name}`,
         name,
         phone: '010-****-5678',
         pax,
@@ -1162,47 +1148,10 @@
 
       document.getElementById('header-res-badge').innerText = myReservations.length;
       openMyResModal();
-      showToast('🎉 원스톱 예약이 완료되었습니다! [내 예약함]에서 확인하세요.');
+      showToast('🎉 예약이 완료되었습니다! [내 예약함]에서 확인하세요.');
     }
 
-    // ================= 5. [탭 3] 상품 & 청년 로컬 가이드 상세 모달 =================
-    function setProductDuration(dur) {
-      prodDuration = dur;
-      ['당일형', '1박 2일', '2박 3일'].forEach(d => {
-        const btn = document.getElementById('prod-dur-' + d);
-        const icon = d === '당일형' ? '☀️ ' : d === '1박 2일' ? '🌙 ' : '⛰️ ';
-        btn.className = (d === dur)
-          ? 'px-4 py-2 rounded-xl font-black text-xs bg-navy text-white shadow-xs'
-          : 'px-4 py-2 rounded-xl font-bold text-xs text-navy';
-        btn.innerText = icon + d;
-      });
-
-      const info = PROD_PRICES[dur];
-      document.getElementById('basic-dur-label').innerText = `${dur} (1인)`;
-      document.getElementById('basic-price-display').innerText = info.basic.toLocaleString() + '원';
-      document.getElementById('basic-inc-text').innerText = info.basicInc;
-
-      document.getElementById('prem-dur-label').innerText = `${dur} (1인)`;
-      document.getElementById('prem-price-display').innerText = info.prem.toLocaleString() + '원';
-      document.getElementById('prem-inc-text').innerText = info.premInc;
-    }
-
-    function renderGuidesPage() {
-      document.getElementById('guide-list-grid').innerHTML = GUIDES_DB.map(g => `
-        <div onclick="openGuideDetailModal(${g.id})" class="cursor-pointer toss-card toss-hover p-5 flex flex-col justify-between space-y-3 border border-cream-border">
-          <div class="flex items-center gap-3.5">
-            <div class="toss-icon-box bg-cream text-2xl">${g.emoji}</div>
-            <div>
-              <span class="text-xs font-extrabold text-coral">${g.region}</span>
-              <h4 class="text-base font-black text-navy">${g.name}</h4>
-            </div>
-          </div>
-          <p class="text-xs font-bold text-navy bg-cream-light p-3 rounded-xl">🎯 ${g.spec}</p>
-          <span class="text-xs font-extrabold text-emerald-700 text-right block">프로필 & 검증 이력 상세보기 ➔</span>
-        </div>
-      `).join('');
-    }
-
+    // 로컬 가이드 상세 모달
     function openGuideDetailModal(id) {
       const g = GUIDES_DB[id];
       document.getElementById('guide-modal-content').innerHTML = `
@@ -1210,23 +1159,23 @@
           <div class="flex items-center gap-3">
             <div class="toss-icon-box bg-cream text-2xl">${g.emoji}</div>
             <div>
-              <span class="text-xs font-extrabold text-coral">${g.region} 전담</span>
+              <span class="text-xs font-extrabold text-coral">${g.region} 활동</span>
               <h3 class="text-lg font-black text-navy">${g.name}</h3>
             </div>
           </div>
           <button onclick="closeGuideDetailModal()" class="text-2xl font-black text-gray-400">&times;</button>
         </div>
         <div class="space-y-3 py-3 text-xs font-bold">
-          <div class="p-3 rounded-2xl bg-cream-light text-navy">🎯 <strong>전문 분야:</strong> ${g.spec}</div>
+          <div class="p-3 rounded-2xl bg-cream-light text-navy">🚌 <strong>BASIC 선택 시 역할:</strong><br/>${g.basicRole}</div>
+          <div class="p-3 rounded-2xl bg-coral-light text-navy">👑 <strong>PREMIUM 선택 시 역할:</strong><br/>${g.premRole}</div>
           <div class="p-3 rounded-2xl bg-emerald-50 text-emerald-950 space-y-1">
             <div class="font-black text-emerald-700">✔ 확인된 교육 및 활동 이력 (시연 예시)</div>
             ${g.verified.map(v => `<div>• ${v}</div>`).join('')}
           </div>
-          <div class="p-3 rounded-2xl bg-gray-50 text-gray-700">🗺️ <strong>담당 코스:</strong> ${g.course}</div>
-          <div class="p-3 rounded-2xl bg-coral-light/50 text-navy">💬 <strong>동행 후기:</strong> "${g.review}"</div>
+          <div class="p-3 rounded-2xl bg-gray-50 text-gray-700">💬 <strong>동행 후기:</strong> "${g.review}"</div>
         </div>
-        <button onclick="closeGuideDetailModal(); goToUnifiedBooking('PREMIUM');" class="toss-btn w-full py-3.5 rounded-2xl bg-coral text-white font-black text-sm">
-          이 가이드와 함께하는 PREMIUM 코스로 예약하기 ➔
+        <button onclick="closeGuideDetailModal()" class="toss-btn w-full py-3.5 rounded-2xl bg-navy text-white font-black text-sm">
+          확인 완료 (닫기)
         </button>
       `;
       document.getElementById('guide-detail-modal').classList.remove('hidden');
@@ -1236,7 +1185,7 @@
       document.getElementById('guide-detail-modal').classList.add('hidden');
     }
 
-    // ================= 6. [탭 4] 팬클럽 단체 여행 =================
+    // ================= 5. [탭 3] 팬클럽 단체 여행 =================
     function setFanclubRole(role) {
       const isMem = role === 'member';
       document.getElementById('fc-role-member').className = isMem ? 'px-4 py-2.5 rounded-xl font-black text-xs bg-coral text-white' : 'px-4 py-2.5 rounded-xl font-bold text-xs text-cream/70';
@@ -1407,7 +1356,7 @@
       showToast(`🔗 초대 링크(${code})가 복사되었습니다!`);
     }
 
-    // ================= 7. 공통 유틸리티 =================
+    // ================= 6. 공통 유틸리티 =================
     function toggleSeniorMode() {
       isSeniorMode = !isSeniorMode;
       document.body.classList.toggle('senior-mode', isSeniorMode);
@@ -1418,7 +1367,7 @@
       const s = getCurrentSinger();
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
-        const u = new SpeechSynthesisUtterance(`현재 ${s.singer} 님의 ${s.region} 공연 맞춤 코스가 설정되어 있습니다. 2번 맞춤 코스 및 예약 탭에서 테마를 고르고 한 번에 예약하실 수 있습니다.`);
+        const u = new SpeechSynthesisUtterance(`현재 ${s.singer} 님의 ${s.region} 공연 맞춤 코스가 설정되어 있습니다. 2번 맞춤 코스 및 통합예약 탭에서 코스와 로컬 가이드를 확인하고 한 번에 예약하실 수 있습니다.`);
         u.lang = 'ko-KR';
         u.rate = 0.95;
         window.speechSynthesis.speak(u);
@@ -1451,8 +1400,6 @@
     window.onload = () => {
       renderSingerGrids();
       renderUnifiedBookingPage();
-      setProductDuration('1박 2일');
-      renderGuidesPage();
       renderFanclubPage();
     };
   </script>
