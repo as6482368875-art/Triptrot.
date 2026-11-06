@@ -29,13 +29,13 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* PPT 캡처용 아이폰 프레임 (모바일 접속 시에는 꽉 찬 화면) */
+    /* PPT 캡처용 폰 프레임 (모바일 접속 시에는 꽉 찬 화면) */
     .phone-mockup {
       width: 385px;
-      height: 785px;
+      height: 760px;
       background-color: var(--cream-bg);
-      border-radius: 48px;
-      border: 11px solid #231F20;
+      border-radius: 44px;
+      border: 10px solid #231F20;
       box-shadow: 0 25px 60px rgba(0, 0, 0, 0.28), inset 0 0 0 2px #555;
       position: relative;
       display: flex;
@@ -53,19 +53,6 @@
         border-radius: 0;
         box-shadow: none;
       }
-    }
-
-    .iphone-notch {
-      width: 132px;
-      height: 22px;
-      background-color: #231F20;
-      border-bottom-left-radius: 14px;
-      border-bottom-right-radius: 14px;
-      position: absolute;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 40;
     }
 
     /* TROTTRIP 영문 커스텀 로고 (O 안에 음표) */
@@ -106,22 +93,11 @@
     <button onclick="switchTab('club')" class="px-3.5 py-1 rounded-full bg-[#F8F4E6] border">3. 팬클럽단체</button>
   </div>
 
-  <!-- ================= 스마트폰 전체 화면 프레임 ================= -->
+  <!-- ================= 스마트폰 전체 화면 프레임 (상단 시간·와이파이 제거 완료) ================= -->
   <div class="phone-mockup">
 
-    <!-- 아이폰 노치 & 상단 상태바 -->
-    <div class="iphone-notch hidden sm:block"></div>
-    <div class="px-6 pt-2.5 pb-1 flex justify-between items-center text-[12px] font-extrabold text-[#231F20] shrink-0">
-      <span>9:41</span>
-      <div class="flex items-center gap-1.5">
-        <i class="fa-solid fa-signal text-[10px]"></i>
-        <i class="fa-solid fa-wifi text-[10px]"></i>
-        <i class="fa-solid fa-battery-full text-sm"></i>
-      </div>
-    </div>
-
     <!-- 1. 상단 TROTTRIP 로고 헤더 -->
-    <header class="px-4 py-1.5 flex items-center justify-between shrink-0">
+    <header class="px-4 pt-3.5 pb-1.5 flex items-center justify-between shrink-0">
       <button onclick="switchTab('home')" class="w-7 h-7 flex items-center justify-center text-[#4A2E1B] text-lg font-black">
         <i class="fa-solid fa-chevron-left"></i>
       </button>
@@ -258,7 +234,7 @@
 
 
       <!-- =========================================================================
-           [탭 2: 바로예약 — 청년 로컬 가이드 상세 설명 칸 포함! (Basic은 가이드 제외)]
+           [탭 2: 바로예약 — 청년 로컬 가이드 한 줄 설명 칸 포함! (잘림 제로)]
            ========================================================================= -->
       <section id="view-package" class="h-full flex flex-col justify-between space-y-1.5 hidden">
         
@@ -278,10 +254,10 @@
               <div class="text-[11px] font-black leading-none">프리미엄 (효도선물)</div>
               <div id="tab-prem-price" class="text-[10px] font-extrabold text-[#2C1D12] mt-0.5">1인 240,000원</div>
             </div>
-          </button>
+          </div>
         </div>
 
-        <!-- ② 중앙 구성 설명 박스 (프리미엄일 때 '청년 로컬 가이드 설명 칸' 탑재!) -->
+        <!-- ② 중앙 구성 설명 박스 (프리미엄일 때 '청년 로컬 가이드 한 줄 설명 칸' 탑재!) -->
         <div id="pkg-center-card" class="bg-white p-3 rounded-2xl border-2 border-[#F5C330] flex-1 flex flex-col justify-between overflow-hidden">
           <!-- JS에서 렌더링 -->
         </div>
@@ -361,9 +337,9 @@
       </button>
     </nav>
 
-    <!-- [모달 1: 청년 로컬 가이드 상세 설명 팝업] -->
+    <!-- [모달 1: 청년 로컬 가이드 상세 설명 팝업 (모든 항목 한 문장으로 깔끔하게 표시)] -->
     <div id="guide-modal" class="absolute inset-0 bg-black/65 z-50 hidden flex items-center justify-center p-4">
-      <div class="bg-[#FDFBF3] w-full rounded-3xl p-4 space-y-3 border-2 border-[#F5C330] shadow-2xl">
+      <div class="bg-[#FDFBF3] w-full rounded-3xl p-4 space-y-2.5 border-2 border-[#F5C330] shadow-2xl">
         <div class="flex justify-between items-center border-b border-[#ECE3C8] pb-2">
           <div class="flex items-center gap-2">
             <span class="bg-[#2C1D12] text-[#FFE135] text-[10px] font-black px-2 py-0.5 rounded-full">지역 청년 일자리 상생</span>
@@ -372,8 +348,8 @@
           <button onclick="closeGuideModal()" class="text-xl font-black text-gray-400">&times;</button>
         </div>
 
-        <div id="guide-modal-body" class="space-y-2.5 text-xs">
-          <!-- JS에서 선택된 가이드 프로필 상세 렌더링 -->
+        <div id="guide-modal-body" class="space-y-2 text-xs">
+          <!-- JS에서 선택된 가이드 프로필 한 줄 요약 렌더링 -->
         </div>
 
         <div class="grid grid-cols-2 gap-2 pt-1">
@@ -405,7 +381,7 @@
   </div>
 
   <script>
-    // ================= 1. 가수 및 청년 로컬 가이드 상세 데이터 =================
+    // ================= 1. 가수 및 청년 로컬 가이드 한 문장 데이터 =================
     const SINGER_DATA = {
       '임영웅': {
         venue: '고양종합운동장',
@@ -453,37 +429,37 @@
       }
     };
 
-    // 청년 로컬 가이드 상세 설명 데이터베이스
+    // 모든 설명이 밑으로 내려가거나 잘리지 않도록 핵심 한 문장(One-Line)으로 설계된 가이드 DB
     const GUIDES_DB = [
       {
         name: '김민지 청년 로컬가이드 (26세)',
-        region: '대구·경북권 전담',
+        region: '대구·경북 전담',
         emoji: '👩‍✈️',
-        badges: ['✔ 관광재단 교육수료', '✔ 응급처치(CPR) 자격', '★ 평점 4.95'],
-        shortIntro: '간호학 전공 트롯 찐팬! 어르신 보폭에 맞춘 평지 안내와 덜 붐비는 화장실·좌석 착석까지 친딸처럼 챙겨드립니다.',
-        history: ['대구관광재단 청년 로컬가이드 양성과정 수료(32시간)', '대한적십자사 응급처치 및 심폐소생술(CPR) 자격 보유'],
-        course: '기차역/자택 픽업 ➔ 사전예약 맛집 VIP룸 ➔ 평지 명소 산책·스냅촬영 ➔ 공연장 좌석 착석 에스코트',
-        review: '"어머니 혼자 보내드려 걱정했는데 기차역 마중부터 좌석 착석까지 카톡 사진으로 보내주셔서 정말 든든했습니다!"'
+        badges: ['✔ 관광재단 수료', '✔ 응급처치 자격', '★ 4.95'],
+        oneLineIntro: '간호학 전공! 평지 동선과 좌석 착석까지 친딸처럼 모십니다.',
+        oneLineHistory: '대구관광재단 가이드 수료(32시간) 및 적십자 응급처치 자격 보유',
+        oneLineCourse: '역 픽업 ➔ 예약 맛집 ➔ 평지 명소 산책 ➔ 공연장 좌석 에스코트',
+        oneLineReview: '"기차역 마중부터 착석까지 카톡 사진으로 보내줘서 안심됐어요!"'
       },
       {
         name: '박준영 청년 로컬가이드 (28세)',
-        region: '수도권·부산권 전담',
+        region: '수도권·부산 전담',
         emoji: '🧑‍✈️',
-        badges: ['✔ 5년 무사고 안전운전', '✔ 로컬 크리에이터 수료', '★ 평점 4.98'],
-        shortIntro: '전용 밴 안전운행과 추억 스냅 촬영 전문가! 숨은 지역 노포 맛집 해설부터 편안한 귀가까지 책임집니다.',
-        history: ['지역 관광공사 로컬 크리에이터 아카데미 수료', '1종 보통 운전면허 및 5년 무사고 안전운전 증명 확인'],
-        course: '전용밴 Door-to-Door 픽업 ➔ 향토 보양식 오찬 ➔ 오션뷰/호수뷰 성지 카페 ➔ 공연장 에스코트',
-        review: '"부모님 두 분 모시고 다녀오셨는데 운전도 너무 편안하고 사진도 화보처럼 찍어주셔서 최고의 효도선물이 됐어요."'
+        badges: ['✔ 5년 무사고 운전', '✔ 크리에이터 수료', '★ 4.98'],
+        oneLineIntro: '전용밴 안전운행부터 맛집 해설·스냅 촬영까지 완벽 책임집니다.',
+        oneLineHistory: '관광공사 크리에이터 수료 및 1종 보통 5년 무사고 안전운전 확인',
+        oneLineCourse: '자택/역 픽업 ➔ 향토 보양식 ➔ 성지 카페 ➔ 공연장 안전 동행',
+        oneLineReview: '"운전도 편안하고 부모님 사진도 화보처럼 찍어줘서 최고였어요!"'
       },
       {
         name: '정소연 청년 로컬가이드 (25세)',
-        region: '전주·안동 문화권 전담',
+        region: '전주·안동 전담',
         emoji: '👩‍🎓',
-        badges: ['✔ 문화유산 해설 수료', '✔ 시니어 길안내 봉사', '★ 평점 4.92'],
-        shortIntro: '전통문화·한옥마을 스토리텔러! 공연 전 지루하지 않게 재미있는 지역 역사 해설과 공방 체험을 도와드립니다.',
-        history: ['전통문화유산 해설 아카데미 기초과정 수료', '시니어 디지털 길안내 봉사단 40시간 이수'],
-        course: '역 마중 ➔ 종가 한식 반상 ➔ 전통 한지부채/식혜 공방 체험 ➔ 공연장 안전 동행',
-        review: '"공연만 보고 왔으면 아쉬웠을 텐데 가이드님 설명 들으며 한지 부채도 만들고 찻집에서 쉰 시간이 너무 좋았습니다."'
+        badges: ['✔ 문화해설 수료', '✔ 시니어 봉사단', '★ 4.92'],
+        oneLineIntro: '재미있는 지역 역사 해설과 전통 공방 체험을 다정하게 돕습니다.',
+        oneLineHistory: '전통문화유산 해설 기초과정 및 시니어 길안내 봉사 40시간 수료',
+        oneLineCourse: '역 마중 ➔ 종가 한식 반상 ➔ 전통 공방 체험 ➔ 공연장 에스코트',
+        oneLineReview: '"가이드님 설명 들으며 부채도 만들고 찻집에서 편히 쉬었습니다!"'
       }
     ];
 
@@ -491,7 +467,7 @@
     let curSinger = '임영웅';
     let curDuration = '당일형';
     let curThemeIdx = 0;
-    let curPkgMode = 'premium'; // 청년 로컬가이드 설명 칸이 바로 보이도록 기본값 premium
+    let curPkgMode = 'premium';
     let curPax = 2;
     let curGuideIdx = 0;
     let curClubMode = 'member';
@@ -554,7 +530,7 @@
       showToast(`🪄 포함 코스가 [${d.themes[curThemeIdx]}]로 변경되었습니다!`);
     }
 
-    // ================= 4. 바로예약 탭 (프리미엄에 '청년 로컬 가이드 설명 칸' 탑재!) =================
+    // ================= 4. 바로예약 탭 (청년 로컬 가이드 한 줄 설명 칸 적용!) =================
     function selectPkgMode(mode) {
       curPkgMode = mode;
       if (mode === 'premium' && curPax > 6) curPax = 2;
@@ -587,7 +563,7 @@
       const card = document.getElementById('pkg-center-card');
 
       if (isPrem) {
-        // 🔥 프리미엄(Premium): 사진 2번 구성 + 눈에 확 들어오는 '청년 로컬 가이드 상세 설명 칸' 포함!
+        // 프리미엄(Premium): 줄바꿈/잘림 없이 딱 한 문장으로 들어오는 청년 로컬가이드 설명 칸
         card.innerHTML = `
           <div class="flex justify-between items-center">
             <span class="bg-[#46331F] text-[#FFE135] text-[10px] font-black px-2.5 py-0.5 rounded-full">
@@ -614,19 +590,19 @@
             </div>
           </div>
 
-          <!-- 2) 🔥 요청하신 '청년 로컬 가이드 설명 칸' (프로필·배지·소개·변경/상세보기) -->
+          <!-- 2) 청년 로컬 가이드 한 줄 설명 칸 (글자 잘림 완벽 방지) -->
           <div class="bg-[#FFFDF0] p-2.5 rounded-2xl border-2 border-[#F5C330] space-y-1.5">
             <div class="flex justify-between items-center">
-              <div class="flex items-center gap-2">
+              <div class="flex items-center gap-2 min-w-0">
                 <div class="w-8 h-8 rounded-xl bg-[#2C1D12] text-[#FFE135] flex items-center justify-center text-base shrink-0">
                   ${g.emoji}
                 </div>
-                <div>
-                  <span class="text-[9px] font-black text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded">${g.region} · 8시간 전담 동행</span>
-                  <h4 class="font-black text-xs text-[#2C1D12] leading-tight mt-0.5">${g.name}</h4>
+                <div class="min-w-0">
+                  <span class="text-[9px] font-black text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded">${g.region} · 8시간 전담</span>
+                  <h4 class="font-black text-xs text-[#2C1D12] truncate mt-0.5">${g.name}</h4>
                 </div>
               </div>
-              <div class="flex gap-1">
+              <div class="flex gap-1 shrink-0">
                 <button onclick="openGuideModal()" class="px-2 py-1 rounded-lg bg-white border border-[#2C1D12] text-[#2C1D12] text-[10px] font-black">
                   상세소개
                 </button>
@@ -636,19 +612,19 @@
               </div>
             </div>
 
-            <!-- 가이드 검증 배지 -->
-            <div class="flex flex-wrap gap-1">
-              ${g.badges.map(b => `<span class="bg-[#F8F4E6] border border-[#E2D9C0] text-[#4A2E1B] text-[9px] font-extrabold px-1.5 py-0.5 rounded">${b}</span>`).join('')}
+            <!-- 가이드 검증 배지 한 줄 -->
+            <div class="flex gap-1 overflow-hidden">
+              ${g.badges.map(b => `<span class="bg-[#F8F4E6] border border-[#E2D9C0] text-[#4A2E1B] text-[9px] font-extrabold px-1.5 py-0.5 rounded shrink-0">${b}</span>`).join('')}
             </div>
 
-            <!-- 가이드 역할 설명 문구 -->
-            <p class="text-[10px] font-bold text-[#4A2E1B] bg-white p-2 rounded-xl border border-[#ECE3C8] leading-snug">
-              💬 "${g.shortIntro}"
-            </p>
+            <!-- 가이드 역할 한 문장 설명 (절대 밑으로 잘리지 않음) -->
+            <div class="text-[10.5px] font-extrabold text-[#4A2E1B] bg-white px-2.5 py-2 rounded-xl border border-[#ECE3C8] truncate">
+              💬 ${g.oneLineIntro}
+            </div>
           </div>
         `;
       } else {
-        // 기본(Basic): 청년 로컬 가이드 제외 (전용버스 + 맛집 예약 + 전통시장 코스로만 깔끔하게 구성)
+        // 기본(Basic): 청년 로컬 가이드 제외
         card.innerHTML = `
           <div class="flex justify-between items-center">
             <span class="bg-[#46331F] text-[#FFE135] text-[10px] font-black px-2.5 py-0.5 rounded-full">
@@ -694,32 +670,39 @@
       document.getElementById('pkg-total-price').innerText = `${total} 원`;
     }
 
+    // 가이드 상세 팝업도 각 항목이 딱 한 문장으로 깔끔하게 보이도록 렌더링
     function openGuideModal() {
       const g = GUIDES_DB[curGuideIdx];
       document.getElementById('guide-modal-body').innerHTML = `
-        <div class="flex items-center gap-3 bg-white p-3 rounded-2xl border border-[#ECE3C8]">
-          <div class="w-12 h-12 rounded-2xl bg-[#2C1D12] text-[#FFE135] flex items-center justify-center text-2xl shrink-0">${g.emoji}</div>
-          <div>
+        <div class="flex items-center gap-3 bg-white p-2.5 rounded-2xl border border-[#ECE3C8]">
+          <div class="w-11 h-11 rounded-2xl bg-[#2C1D12] text-[#FFE135] flex items-center justify-center text-xl shrink-0">${g.emoji}</div>
+          <div class="min-w-0">
             <span class="text-[10px] font-black text-emerald-800">${g.region}</span>
-            <h4 class="font-black text-sm text-[#2C1D12]">${g.name}</h4>
-            <div class="flex gap-1 mt-1">
+            <h4 class="font-black text-sm text-[#2C1D12] truncate">${g.name}</h4>
+            <div class="flex gap-1 mt-0.5">
               ${g.badges.map(b => `<span class="bg-[#FFF5C0] text-[#4A2E1B] text-[9px] font-black px-1.5 py-0.5 rounded">${b}</span>`).join('')}
             </div>
           </div>
         </div>
 
-        <div class="bg-white p-3 rounded-2xl border border-[#ECE3C8] space-y-1">
-          <div class="font-black text-[#2C1D12]">🎓 확인된 교육 및 자격 이력 (시연 예시)</div>
-          ${g.history.map(h => `<div class="text-[11px] font-bold text-gray-600">• ${h}</div>`).join('')}
+        <div class="bg-white px-3 py-2 rounded-xl border border-[#ECE3C8]">
+          <div class="font-black text-[11px] text-[#2C1D12]">💬 한 줄 소개</div>
+          <div class="text-[11px] font-bold text-[#4A2E1B] truncate mt-0.5">${g.oneLineIntro}</div>
         </div>
 
-        <div class="bg-white p-3 rounded-2xl border border-[#ECE3C8] space-y-1">
-          <div class="font-black text-[#2C1D12]">🗺️ 전담 에스코트 동선</div>
-          <div class="text-[11px] font-bold text-[#4A2E1B]">${g.course}</div>
+        <div class="bg-white px-3 py-2 rounded-xl border border-[#ECE3C8]">
+          <div class="font-black text-[11px] text-[#2C1D12]">🎓 검증된 교육·자격 이력</div>
+          <div class="text-[11px] font-bold text-gray-600 truncate mt-0.5">${g.oneLineHistory}</div>
         </div>
 
-        <div class="bg-[#FFF8D6] p-3 rounded-2xl border border-[#F5C330] text-[11px] font-bold text-[#2C1D12]">
-          💬 <strong>이용 가족 후기:</strong> ${g.review}
+        <div class="bg-white px-3 py-2 rounded-xl border border-[#ECE3C8]">
+          <div class="font-black text-[11px] text-[#2C1D12]">🗺️ 전담 동행 코스</div>
+          <div class="text-[11px] font-bold text-[#4A2E1B] truncate mt-0.5">${g.oneLineCourse}</div>
+        </div>
+
+        <div class="bg-[#FFF8D6] px-3 py-2 rounded-xl border border-[#F5C330]">
+          <div class="font-black text-[11px] text-[#2C1D12]">⭐ 가족 이용 후기</div>
+          <div class="text-[11px] font-bold text-[#2C1D12] truncate mt-0.5">${g.oneLineReview}</div>
         </div>
       `;
       document.getElementById('guide-modal').classList.remove('hidden');
