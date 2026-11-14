@@ -83,9 +83,9 @@
   <div class="hidden sm:flex flex-wrap items-center justify-center gap-2 mb-3 bg-white/90 px-4 py-2 rounded-full shadow-sm border border-[#DCD4C0] text-xs font-black text-[#4A2E1B]">
     <span>📸 PPT 캡처용 화면 바로가기:</span>
     <button onclick="switchTab('home')" class="px-3 py-1 rounded-full bg-[#FFE135] text-[#2C1D12]">1. 공연·맛집 (홈)</button>
-    <button onclick="switchTab('package'); selectPkgMode('basic');" class="px-3 py-1 rounded-full bg-[#4A2E1B] text-[#FFE135]">2-A. 바로예약 (Basic 7.9만)</button>
-    <button onclick="switchTab('package'); selectPkgMode('premium');" class="px-3 py-1 rounded-full bg-rose-700 text-white">2-B. 바로예약 (Premium 꽉찬버전)</button>
-    <button onclick="switchTab('guide')" class="px-3 py-1 rounded-full bg-emerald-700 text-white">3. 가이드 페이지 (청년+시니어 2버전)</button>
+    <button onclick="switchTab('package'); selectPkgMode('basic');" class="px-3 py-1 rounded-full bg-[#4A2E1B] text-[#FFE135]">2-A. 바로예약 (Basic + 모집현황)</button>
+    <button onclick="switchTab('package'); selectPkgMode('premium');" class="px-3 py-1 rounded-full bg-rose-700 text-white">2-B. 바로예약 (Premium 출발지제거)</button>
+    <button onclick="switchTab('guide')" class="px-3 py-1 rounded-full bg-emerald-700 text-white">3. 가이드 페이지 (청년+시니어)</button>
     <button onclick="switchTab('club')" class="px-3 py-1 rounded-full bg-[#F8F4E6] border">4. 팬클럽단체</button>
   </div>
 
@@ -228,21 +228,21 @@
 
 
       <!-- =========================================================================
-           [탭 2: 바로예약 — 빈 여백 0%! 위아래로 빽빽하게 꽉 찬 구성]
+           [탭 2: 바로예약 — Basic 전용 모집현황 바 + Premium 출발지 선택칸 제거 적용!]
            ========================================================================= -->
       <section id="view-package" class="h-full flex flex-col justify-between hidden">
         
         <div class="bg-[#F4EFE0] p-1.5 rounded-2xl border border-[#ECE3C8] grid grid-cols-2 gap-1.5 shrink-0">
-          <button onclick="selectPkgMode('basic')" id="pkg-tab-basic" class="btn-bounce py-1.5 px-2.5 rounded-xl bg-white text-[#2C1D12] flex items-center gap-2 text-left shadow-2xs">
-            <i class="fa-solid fa-bus text-gray-500 text-base"></i>
+          <button onclick="selectPkgMode('basic')" id="pkg-tab-basic" class="btn-bounce py-1.5 px-2.5 rounded-xl bg-[#F5C330] text-[#2C1D12] flex items-center gap-2 text-left shadow-xs border border-[#D9A310]">
+            <i class="fa-solid fa-bus text-[#2C1D12] text-base"></i>
             <div>
               <div class="text-[11px] font-black leading-none whitespace-nowrap">기본 (보조금 특가)</div>
               <div id="tab-basic-price" class="text-[10px] font-black text-rose-700 mt-0.5 whitespace-nowrap">실결제 79,000원</div>
             </div>
           </button>
 
-          <button onclick="selectPkgMode('premium')" id="pkg-tab-premium" class="btn-bounce py-1.5 px-2.5 rounded-xl bg-[#F5C330] text-[#2C1D12] flex items-center gap-2 text-left shadow-xs border border-[#D9A310]">
-            <i class="fa-solid fa-car-side text-[#2C1D12] text-base"></i>
+          <button onclick="selectPkgMode('premium')" id="pkg-tab-premium" class="btn-bounce py-1.5 px-2.5 rounded-xl bg-white text-[#2C1D12] flex items-center gap-2 text-left shadow-2xs">
+            <i class="fa-solid fa-car-side text-gray-500 text-base"></i>
             <div>
               <div class="text-[11px] font-black leading-none whitespace-nowrap">프리미엄 (효도선물)</div>
               <div id="tab-prem-price" class="text-[10px] font-extrabold text-[#2C1D12] mt-0.5 whitespace-nowrap">1인 240,000원</div>
@@ -250,13 +250,15 @@
           </button>
         </div>
 
-        <!-- 🔥 justify-between을 빼고 내부 요소들이 빈틈없이 꽉 차도록 설계된 중앙 카드 -->
+        <!-- 중앙 카드 (Basic일 때만 모집 현황 UI 표시 / Premium에는 표시 안 함!) -->
         <div id="pkg-center-card" class="bg-white p-2.5 rounded-2xl border-2 border-[#F5C330] flex-1 my-1.5 flex flex-col gap-1.5 overflow-hidden">
           <!-- JS에서 렌더링 -->
         </div>
 
+        <!-- 하단 예약 박스 (Basic일 때는 출발지+인원 2칸 / Premium일 때는 출발지 없애고 인원만 1칸!) -->
         <div class="bg-white p-2.5 rounded-2xl border border-[#CED4DA] space-y-1.5 shrink-0">
-          <div class="grid grid-cols-2 gap-1.5">
+          <div id="pkg-options-row" class="grid grid-cols-2 gap-1.5">
+            <!-- Basic일 때만 보이는 출발지 선택칸 -->
             <select id="pkg-origin-select" class="px-2 py-1.5 rounded-xl bg-[#FDFBF3] border border-[#E2D9C0] text-[11px] font-black text-[#2C1D12]">
               <option value="진주·경남 출발">🚌 진주·경남 출발</option>
               <option value="부산·울산 출발">🚌 부산·울산 출발</option>
@@ -264,7 +266,8 @@
               <option value="대구·경북 출발">🚌 대구·경북 출발</option>
             </select>
 
-            <div class="flex items-center justify-between bg-[#FDFBF3] rounded-xl border border-[#E2D9C0] px-2.5 py-1">
+            <!-- 인원 선택칸 (Premium일 때는 가로 전체 폭 차지) -->
+            <div id="pkg-pax-box" class="flex items-center justify-between bg-[#FDFBF3] rounded-xl border border-[#E2D9C0] px-2.5 py-1">
               <span class="text-[11px] font-extrabold text-[#6C6358] whitespace-nowrap">인원</span>
               <div class="flex items-center gap-1.5">
                 <button onclick="changePax(-1)" class="w-5 h-5 rounded-full bg-white border border-gray-300 font-black text-xs text-[#2C1D12] flex items-center justify-center">-</button>
@@ -276,8 +279,8 @@
 
           <div class="bg-[#2C1D12] text-white px-3.5 py-2 rounded-xl flex justify-between items-center">
             <div>
-              <div id="pkg-summary-label" class="text-[10px] font-extrabold text-gray-200 whitespace-nowrap">Premium(청년 버전) 2인</div>
-              <div id="pkg-total-price" class="text-lg font-black text-[#F5C330] leading-tight whitespace-nowrap">480,000 원</div>
+              <div id="pkg-summary-label" class="text-[10px] font-extrabold text-gray-200 whitespace-nowrap">Basic(단체버스·당일형) 2인</div>
+              <div id="pkg-total-price" class="text-lg font-black text-[#F5C330] leading-tight whitespace-nowrap">158,000 원</div>
             </div>
             <button onclick="confirmBooking()" class="btn-bounce px-4 py-2 rounded-xl bg-[#FFE135] text-[#2C1D12] font-black text-xs shadow whitespace-nowrap">
               예약확정
@@ -464,7 +467,7 @@
     let curSinger = '임영웅';
     let curDuration = '당일형';
     let curThemeIdx = 0;
-    let curPkgMode = 'premium'; // 바로 확인하실 수 있도록 기본값을 premium으로 설정
+    let curPkgMode = 'basic'; // Basic의 모집 현황 바를 바로 확인할 수 있도록 기본값 basic 설정
     let curPax = 2;
 
     let selectedGuideVersion = 'youth';
@@ -473,7 +476,7 @@
     let curClubMode = 'member';
 
     let bookings = [
-      { code: 'PASS-2026', title: '[임영웅] Premium(청년 버전) 2인', sub: '진주·경남 출발 | 박준영 청년 가이드 동행', price: '480,000원' }
+      { code: 'PASS-2026', title: '[임영웅] Basic(단체버스·당일형) 2인', sub: '진주·경남 출발 | 전용 관광버스 단체투어', price: '158,000원' }
     ];
 
     function getActiveGuideObj() {
@@ -572,74 +575,92 @@
         ? 'btn-bounce py-1.5 px-2.5 rounded-xl bg-[#F5C330] text-[#2C1D12] flex items-center gap-2 text-left shadow-xs border border-[#D9A310]'
         : 'btn-bounce py-1.5 px-2.5 rounded-xl bg-white text-[#2C1D12] flex items-center gap-2 text-left shadow-2xs';
 
+      // 🔥 하단 옵션 줄 제어: Basic일 땐 [출발지 + 인원 2칸], Premium일 땐 [출발지 숨기고 인원만 1칸 전체폭]
+      const optionsRow = document.getElementById('pkg-options-row');
+      const originSelect = document.getElementById('pkg-origin-select');
+      if (isPrem) {
+        originSelect.classList.add('hidden');
+        optionsRow.className = 'grid grid-cols-1';
+      } else {
+        originSelect.classList.remove('hidden');
+        optionsRow.className = 'grid grid-cols-2 gap-1.5';
+      }
+
       const card = document.getElementById('pkg-center-card');
 
       if (!isPrem) {
-        // Basic: 79,000원 & 아이콘 5개 꽉 찬 구성
+        // 🔥 Basic 전용: 첨부해주신 이미지와 똑같은 '모집 현황 (0/28명, 출발까지 24명 더 필요)' UI 탑재!
         card.innerHTML = `
           <div class="flex justify-between items-center shrink-0">
             <span class="bg-[#46331F] text-[#FFE135] text-[10px] font-black px-2.5 py-0.5 rounded-full whitespace-nowrap">
-              가성비 단체투어 · 1~40명 대량신청 가능
+              가성비 단체투어 · 1~28명 신청 가능
             </span>
             <span class="text-[11px] font-black text-rose-700 whitespace-nowrap">실결제 ${basicUnit.toLocaleString()}원 (티켓별도)</span>
           </div>
 
-          <div class="bg-[#F9F8F3] px-3 py-2.5 rounded-2xl border border-[#ECE3C8] flex-1 flex flex-col justify-between">
+          <!-- 첨부 이미지와 동일한 모집 현황 박스 (Basic에만 표시!) -->
+          <div class="bg-white px-3 py-2 rounded-xl border border-[#ECE3C8] space-y-1.5 shrink-0">
+            <div class="flex justify-between items-center text-[11px]">
+              <div class="flex items-center gap-1.5 font-extrabold text-[#333333]">
+                <i class="fa-regular fa-user text-[#E67E22] text-xs"></i>
+                <span>모집 현황</span>
+              </div>
+              <span class="font-bold text-[#A0A0A0]">0/28명</span>
+            </div>
+            <div class="w-full h-2 bg-[#F1F1F1] rounded-full overflow-hidden">
+              <div class="h-full bg-[#E67E22] rounded-full" style="width: 0%;"></div>
+            </div>
+            <div class="text-[10.5px] font-extrabold text-[#D97706]">
+              출발까지 24명 더 필요
+            </div>
+          </div>
+
+          <!-- 핵심 포함 내역 (빈 공간 없이 꽉 차게 배치) -->
+          <div class="bg-[#F9F8F3] px-3 py-2 rounded-2xl border border-[#ECE3C8] flex-1 flex flex-col justify-between">
             <div class="flex items-center gap-2.5">
-              <div class="w-9 h-9 rounded-xl bg-white border border-[#E5DEC9] flex items-center justify-center text-base text-[#4A2E1B] shrink-0">
+              <div class="w-8 h-8 rounded-xl bg-white border border-[#E5DEC9] flex items-center justify-center text-sm text-[#4A2E1B] shrink-0">
                 <i class="fa-solid fa-bus"></i>
               </div>
               <div class="leading-tight">
-                <div class="font-black text-[11.5px] text-[#2C1D12] whitespace-nowrap">공연 연계 전용 관광버스 왕복 (${curDuration})</div>
-                <div class="text-[10px] text-gray-500 font-bold mt-0.5 whitespace-nowrap">거점 출발지부터 공연장까지 편안한 이동</div>
+                <div class="font-black text-[11px] text-[#2C1D12] whitespace-nowrap">공연 연계 전용 관광버스 왕복 (${curDuration})</div>
+                <div class="text-[9.5px] text-gray-500 font-bold mt-0.5 whitespace-nowrap">거점 출발지부터 공연장까지 편안한 이동</div>
               </div>
             </div>
 
             <div class="flex items-center gap-2.5">
-              <div class="w-9 h-9 rounded-xl bg-white border border-[#E5DEC9] flex items-center justify-center text-base text-[#4A2E1B] shrink-0">
+              <div class="w-8 h-8 rounded-xl bg-white border border-[#E5DEC9] flex items-center justify-center text-sm text-[#4A2E1B] shrink-0">
                 <i class="fa-solid fa-utensils"></i>
               </div>
               <div class="leading-tight">
-                <div class="font-black text-[11.5px] text-[#2C1D12] whitespace-nowrap">${curSinger} 추천 지역 맛집 사전 예약</div>
-                <div class="text-[10px] text-gray-500 font-bold mt-0.5 whitespace-nowrap">${SINGER_DATA[curSinger].themes[curThemeIdx]}</div>
+                <div class="font-black text-[11px] text-[#2C1D12] whitespace-nowrap">${curSinger} 추천 지역 맛집 사전 예약</div>
+                <div class="text-[9.5px] text-gray-500 font-bold mt-0.5 whitespace-nowrap">${SINGER_DATA[curSinger].themes[curThemeIdx]}</div>
               </div>
             </div>
 
             <div class="flex items-center gap-2.5">
-              <div class="w-9 h-9 rounded-xl bg-white border border-[#E5DEC9] flex items-center justify-center text-base text-[#4A2E1B] shrink-0">
+              <div class="w-8 h-8 rounded-xl bg-white border border-[#E5DEC9] flex items-center justify-center text-sm text-[#4A2E1B] shrink-0">
                 <i class="fa-solid fa-bag-shopping"></i>
               </div>
               <div class="leading-tight">
-                <div class="font-black text-[11.5px] text-[#2C1D12] whitespace-nowrap">전통시장 & 지역 명소 자유 코스</div>
-                <div class="text-[10px] text-emerald-700 font-extrabold mt-0.5 whitespace-nowrap">지자체 지원금·단체할인 적용 (가이드 미포함)</div>
+                <div class="font-black text-[11px] text-[#2C1D12] whitespace-nowrap">전통시장 & 지역 명소 자유 코스</div>
+                <div class="text-[9.5px] text-emerald-700 font-extrabold mt-0.5 whitespace-nowrap">지자체 지원금·단체할인 적용 (가이드 미포함)</div>
               </div>
             </div>
 
             <div class="flex items-center gap-2.5">
-              <div class="w-9 h-9 rounded-xl bg-white border border-[#E5DEC9] flex items-center justify-center text-base text-[#4A2E1B] shrink-0">
+              <div class="w-8 h-8 rounded-xl bg-white border border-[#E5DEC9] flex items-center justify-center text-sm text-[#4A2E1B] shrink-0">
                 <i class="fa-solid fa-chair"></i>
               </div>
               <div class="leading-tight">
-                <div class="font-black text-[11.5px] text-[#2C1D12] whitespace-nowrap">멀미 예방 앞자리 & 또래 단짝 좌석 배정</div>
-                <div class="text-[10px] text-gray-500 font-bold mt-0.5 whitespace-nowrap">혼자 오셔도 비슷한 연령대 팬과 즐겁게 동행</div>
-              </div>
-            </div>
-
-            <div class="flex items-center gap-2.5">
-              <div class="w-9 h-9 rounded-xl bg-white border border-[#E5DEC9] flex items-center justify-center text-base text-[#4A2E1B] shrink-0">
-                <i class="fa-solid fa-shield-heart"></i>
-              </div>
-              <div class="leading-tight">
-                <div class="font-black text-[11.5px] text-[#2C1D12] whitespace-nowrap">1억 원 여행자보험 & 출발 100% 보장</div>
-                <div class="text-[10px] text-rose-700 font-extrabold mt-0.5 whitespace-nowrap">정식 등록 여행사 운행 · 7일 전 전액 무위약금 환불</div>
+                <div class="font-black text-[11px] text-[#2C1D12] whitespace-nowrap">멀미 예방 앞자리 & 또래 단짝 좌석 배정</div>
+                <div class="text-[9.5px] text-gray-500 font-bold mt-0.5 whitespace-nowrap">혼자 오셔도 비슷한 연령대 팬과 즐겁게 동행</div>
               </div>
             </div>
           </div>
         `;
       } else {
-        // 🔥 Premium: 흰 여백 0%! (1) 상단 배지 + (2) 3대 의전 아이콘 & 2줄 설명 + (3) 4단계 당일 전담 타임라인 + (4) 가이드 박스(말줄임표 없이 전체 노출)로 빽빽하게 채움!
+        // 🔥 Premium: 모집 현황 없음 + 빈 여백 0% 구성
         card.innerHTML = `
-          <!-- (1) 최상단 배지 -->
           <div class="flex justify-between items-center shrink-0">
             <span class="bg-[#46331F] text-[#FFE135] text-[10px] font-black px-2.5 py-0.5 rounded-full whitespace-nowrap">
               3040 자녀 효도선물 1위
@@ -647,7 +668,6 @@
             <span class="text-[11px] font-black text-rose-700 whitespace-nowrap">1인 ${premUnit.toLocaleString()}원 (티켓별도)</span>
           </div>
 
-          <!-- (2) 3대 핵심 의전 아이콘 + 2줄 상세 혜택 + 4단계 전담 타임라인 (빈 여백 완벽 제거!) -->
           <div class="bg-[#F9F8F3] p-2.5 rounded-2xl border border-[#ECE3C8] flex-1 flex flex-col justify-between">
             <div class="grid grid-cols-3 gap-1.5 text-center">
               <div class="bg-white p-1.5 rounded-xl border border-[#E5DEC9] flex flex-col items-center justify-center">
@@ -672,7 +692,6 @@
               <div class="whitespace-nowrap">✔ <strong>안심 케어:</strong> 화장실 안내 및 공연장 좌석 착석까지 전담 동행</div>
             </div>
 
-            <!-- 빈 공간에 추가된 4단계 당일 전담 의전 타임라인 -->
             <div class="grid grid-cols-4 gap-1 text-center text-[9px] font-black">
               <div class="bg-[#FFF8D6] py-1 rounded-lg border border-[#F5C330] text-[#2C1D12]">11:00 픽업</div>
               <div class="bg-white py-1 rounded-lg border border-[#E5DEC9] text-[#4A2E1B]">12:30 특식</div>
@@ -681,7 +700,6 @@
             </div>
           </div>
 
-          <!-- (3) 하단 가이드 박스 (말줄임표 없이 끝까지 다 보임!) -->
           <div class="bg-[#FFFDF0] p-2.5 rounded-2xl border-2 border-[#F5C330] space-y-1.5 shrink-0">
             <div class="flex items-center gap-2.5">
               <div class="w-9 h-9 rounded-xl bg-[#2C1D12] text-[#FFE135] flex items-center justify-center text-lg shrink-0">
@@ -822,9 +840,8 @@
     }
 
     function changePax(delta) {
-      const maxPax = curPkgMode === 'basic' ? 40 : 6;
-      const step = (curPkgMode === 'basic' && curPax >= 10 && delta > 0) ? 5 : 1;
-      curPax = Math.max(1, Math.min(maxPax, curPax + (delta * step)));
+      const maxPax = curPkgMode === 'basic' ? 28 : 6;
+      curPax = Math.max(1, Math.min(maxPax, curPax + delta));
       renderPackageView();
     }
 
@@ -888,8 +905,8 @@
       const total = document.getElementById('pkg-total-price').innerText;
       const g = getActiveGuideObj();
       const subText = curPkgMode === 'premium'
-        ? `${origin} | ${g.name}`
-        : `${origin} | 전용 관광버스 단체투어 (가이드 미포함)`;
+        ? `자택 Door-to-Door 픽업 | ${g.name}`
+        : `${origin} | 전용 관광버스 단체투어`;
 
       bookings.unshift({
         code: 'PASS-' + Math.floor(1000 + Math.random() * 9000),
